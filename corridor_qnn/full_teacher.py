@@ -29,7 +29,9 @@ def legacy_teacher_action(features):
 def teacher_action(features):
     """Keep the original combat rules; pulse use while following a clear route."""
     f=np.asarray(features)
-    if f[15]>.5 or (f[31]>.5 and f[3]*9<3):
+    # Distant or ammo-less fights only drain ammo and health; keep following the route.
+    fight=f[15]>.5 and f[1]>0 and f[14]<1
+    if fight or (f[31]>.5 and f[3]*9<3):
         return legacy_teacher_action(f)
     wb=math.atan2(f[9],f[8])
     last=int(np.argmax(f[len(BASE_FEATURES):])) if f[len(BASE_FEATURES):].sum() else -1

@@ -143,7 +143,9 @@ class FullDoom:
                 math.cos(eb) if enemy else 0,math.sin(eb) if enemy else 0,min(ed/800,3),float(enemy is not None),
                 *rays,min(np.linalg.norm(delta)/20,3),float(stuck),len(self.visited)/100,
                 self.steps/self.max_steps,(self.last_v['HEALTH']-v['HEALTH'])/50,*np.clip(delta/32,-3,3),
-                self.previous[9],self.previous[13],self.previous[15],float(v['WEAPON3']>0),float(v['WEAPON4']>0)]
+                # has_shotgun/has_chaingun require ammo: selecting an empty weapon is ignored by Doom.
+                self.previous[9],self.previous[13],self.previous[15],
+                float(v['WEAPON3']>0 and v['AMMO3']>0),float(v['WEAPON4']>0 and v['AMMO4']>0)]
         f=np.asarray(values+[float(i==self.last_action) for i in range(len(ACTIONS))],dtype=np.float32)
         if len(f)!=FEATURE_DIM or not np.isfinite(f).all(): raise RuntimeError('Invalid full observation')
         self.previous=f.copy()
