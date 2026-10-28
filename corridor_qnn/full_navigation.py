@@ -13,8 +13,10 @@ from PIL import Image, ImageDraw
 
 def map_name(value, secret=False):
     value = str(value).upper()
+    if len(value) == 4 and value[0] == 'E' and value[2] == 'M' and value[1] in '1234' and value[3] in '123456789':
+        return value
     if len(value) != 5 or not value.startswith('MAP') or not value[3:].isdigit():
-        raise ValueError('Map must be MAP01 through MAP30 (MAP31/32 with --secret-maps)')
+        raise ValueError('Map must be MAP01 through MAP30 (MAP31/32 with --secret-maps) or ExMy (E1M1-E4M9)')
     if not 1 <= int(value[3:]) <= (32 if secret else 30):
         raise ValueError('Map outside supported range')
     return value
@@ -195,7 +197,7 @@ class Navigator(LegacyNavigator):
     def reset(self):
         super().reset()
         self.recent=deque(maxlen=12); self.temporary={}; self.goal=None
-        self.mode='route'; self.replans=0; self.collision_events=0
+        self.mode='route'; self.replans=0; self.collision_events=0; self.use_wait=0
 
     def free(self,node):
         return super().free(node) and self.temporary.get(node,0)<=self.calls
@@ -262,8 +264,10 @@ class Navigator(LegacyNavigator):
             target=point
         if self.goal is not None and np.linalg.norm(xy-self.goal)<72:
             target=self.goal.copy()
+        # Pressing USE on a moving door reverses it; hide use targets until it opens.
+        if last_action in (12,13): self.use_wait=self.calls+12
         near=1e6
-        for p,q,mid in self.use_lines:
+        for p,q,mid in self.use_lines if self.calls>=self.use_wait else ():
             d=np.linalg.norm(mid-xy)
             # Only use interactions ahead of the route, rather than arbitrary specials.
             if d<80 and np.dot(mid-xy,target-xy)>0:

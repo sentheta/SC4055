@@ -54,16 +54,17 @@ class FullDoom:
             raise ValueError('skill must be 1..5 and frame_skip/max_steps positive')
         self.vzd=vzd; self.skill=skill; self.frame_skip=frame_skip
         self.max_steps=max_steps; self.seed=seed
-        self.iwad = Path(iwad) if iwad else Path(vzd.install_path)/'freedoom2.wad'
+        default_wad = 'freedoom1.wad' if self.map.startswith('E') else 'freedoom2.wad'
+        self.iwad = Path(iwad) if iwad else Path(vzd.install_path)/default_wad
         if not self.iwad.is_file():
-            raise FileNotFoundError(f'IWAD absent: {self.iwad}; supply --iwad assets/freedoom2.wad')
+            raise FileNotFoundError(f'IWAD absent: {self.iwad}; supply --iwad PATH')
         self.navigation=navigation
         if navigation not in ('legacy','improved'): raise ValueError('Unknown navigation version')
         self.navigator=(LegacyNavigator if navigation=='legacy' else Navigator)(self.iwad,self.map)
         self.iwad_hash=hashlib.sha256(self.iwad.read_bytes()).hexdigest()
         self.game=vzd.DoomGame()
         try:
-            self.game.load_config(str(Path(vzd.scenarios_path)/'freedoom2.cfg'))
+            self.game.load_config(str(Path(vzd.scenarios_path)/('freedoom1.cfg' if self.map.startswith('E') else 'freedoom2.cfg')))
             self.game.set_doom_game_path(str(self.iwad.resolve()))
             self.game.set_doom_map(self.map)
             self.game.set_doom_skill(skill)

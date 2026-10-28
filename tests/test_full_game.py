@@ -51,9 +51,10 @@ def test_maps(name):
 
 
 def test_secret_maps_explicit():
-    for name in ('MAP00','MAP31','E1M1','MAP1','MAP33'):
+    for name in ('MAP00','MAP31','MAP1','MAP33','E0M1','E5M1','E1M0','E1M10'):
         with pytest.raises(ValueError): map_name(name)
     assert map_name('MAP32',True)=='MAP32'
+    assert map_name('e1m1')=='E1M1'
 
 
 @pytest.mark.parametrize('inputs,expected',[
