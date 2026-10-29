@@ -1,0 +1,2 @@
+random angles (512): max |<Z> torch - pennylane| = 6.56e-07
+game states (2000): max |logit diff| = 8.11e-06, max |value diff| = 1.04e-07, argmax action agreement = 100.0000%
