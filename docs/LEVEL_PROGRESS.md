@@ -66,6 +66,37 @@ static wall. Added, in order of discovery:
 
 PennyLane check of e1m2_v1: 10/10 episodes identical, circuit within 6e-7.
 
+### Student failure analysis (22:40)
+
+Replaying e1m2_v2 on failing seeds: in 5/6 timeouts the student agreed with
+the teacher 95-100% while the *planner* looped; most were fixed by trigger
+verification. The remaining stalls are absorbing states: the student stands
+still pressing ATTACK for thousands of steps (inputs no longer change, so the
+output does not either) while the teacher's label is "turn". Pure behaviour
+cloning never sees these states, so the fix is DAgger.
+
+### Teacher combat experiments (32 seeds, 800-831, 8000 steps)
+
+Baseline teacher: 20/32 complete, 11 deaths. Deaths cluster in two fixed
+encounters: the room behind door 266 (before the red key, 4) and the
+approach to the yellow key (after the red key, 6). Most are close fights with
+demons while holding the pistol (shells spent).
+
+| Variant | Completed | Deaths | Kept? |
+|---|---|---|---|
+| Baseline | 20 | 11 | yes |
+| Melee back-off at 200 instead of 128 units (16 seeds) | 9/16 | 7 | no |
+| A: strafe-fire when aimed | 17 | 12 | no |
+| B: back off firing when health < 40 | 13 | 17 | no |
+| A+B | ~8 | 22 | no |
+| C: shotgun only within 300 units | 18 | 12 | no |
+| D: heal to 90 before pushing on, long detours < 70 | 21 | 9 | no (noise) |
+| Ammo seeking (16 seeds) | 7/16 | 8 | no: detours walk into fights |
+| Always run (`cl_run`, then SPEED on moves) | 0 | 0 | no: turning breaks |
+
+Hand-tuned combat rules have plateaued around 60-65% teacher completion.
+The 16-seed estimate of 75% was optimistic; 32 seeds are needed to compare.
+
 ### Open issues (22:36, 29 Oct)
 
 - 3/20 student seeds stall after the blue key with ~20 kills (planner loop).
