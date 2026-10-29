@@ -363,7 +363,24 @@ class Navigator(LegacyNavigator):
         n=max(2,int(np.linalg.norm(np.asarray(b)-a)/(self.cell/2))+1)
         return all(self.free(self.grid(p)) for p in np.linspace(a,b,n))
 
+    hazard_cost = 10  # one damaging cell weighs as much as ten safe ones
+
     def _search(self,start):
+        if self.hazard.any():
+            # Dijkstra: damaging floors are crossed only where needed, by the shortest stretch.
+            import heapq
+            heap=[(0,start)]; parent={start:None}; dist={start:0}
+            while heap:
+                d,(x,y)=heapq.heappop(heap)
+                if d>dist[(x,y)]: continue
+                drops=[n for n in (*self.drops.get((x,y),()),*self.dyn_drops.get((x,y),())) if not self.hazard[n[1],n[0]]]
+                for node in ((x+1,y),(x-1,y),(x,y+1),(x,y-1),*drops):
+                    # Never drop into a damaging pit: there may be no way back up.
+                    if not self.free(node): continue
+                    nd=d+(self.hazard_cost if self.hazard[node[1],node[0]] else 1)
+                    if nd<dist.get(node,np.inf):
+                        dist[node]=nd; parent[node]=(x,y); heapq.heappush(heap,(nd,node))
+            return parent,dist
         queue=deque([start]); parent={start:None}; dist={start:0}
         while queue:
             x,y=queue.popleft()
@@ -394,20 +411,6 @@ class Navigator(LegacyNavigator):
         return gain
 
     def route(self,start):
-        """Plan around damaging floors; cross them only when nothing useful is reachable otherwise."""
-        inside=0<=start[1]<self.hazard.shape[0] and 0<=start[0]<self.hazard.shape[1] and self.hazard[start[1],start[0]]
-        if not self.hazard.any() or inside:
-            self.avoid_hazard=False; return self._route(start)
-        self.avoid_hazard=True; path=self._route(start)
-        if self.mode in ('explore','drop','advance','health'):
-            # Hazard cells are always unexplored ground; cross only for a real objective.
-            saved=self.advance_goal
-            self.avoid_hazard=False; crossing=self._route(start)
-            if self.mode in ('exit','key','trigger'): return crossing
-            self.advance_goal=saved; self.avoid_hazard=True; path=self._route(start)
-        return path
-
-    def _route(self,start):
         if not self.free(start):
             candidates=[(start[0]+x,start[1]+y) for x in range(-3,4) for y in range(-3,4)]
             good=[n for n in candidates if self.free(n)]
@@ -451,7 +454,8 @@ class Navigator(LegacyNavigator):
             mode='key'
         if not choices and self.known_reach:
             # A trigger or key just opened new ground (e.g. a lowered lift): go there.
-            fresh=[n for n in parent if n not in self.known_reach]
+            # Damaging floors are never a destination in themselves.
+            fresh=[n for n in parent if n not in self.known_reach and not self.hazard[n[1],n[0]]]
             if len(fresh)>=4: self.advance_goal=min(fresh,key=lambda n:abs(dist[n]-24))
             if self.advance_goal in parent and dist[self.advance_goal]>2:
                 choices=[(dist[self.advance_goal],self.advance_goal,None)]
@@ -495,7 +499,7 @@ class Navigator(LegacyNavigator):
             # Nothing to aim at (or already there): favor unvisited reachable regions,
             # retaining travel-cost pressure. Never return an empty path without a goal
             # point, which would leave the waypoint on the player and spin it in place.
-            goal=max((n for n in parent if n!=start),default=start,
+            goal=max((n for n in parent if n!=start and not self.hazard[n[1],n[0]]),default=start,
                      key=lambda n:min(dist[n],40)/(1+self.visits[n[1],n[0]]*8))
             self.mode='explore'; self.advance_goal=None
         path=[]
