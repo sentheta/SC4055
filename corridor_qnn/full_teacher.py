@@ -37,8 +37,10 @@ def teacher_action(features):
         return legacy_teacher_action(f)
     wb=math.atan2(f[9],f[8])
     last=int(np.argmax(f[len(BASE_FEATURES):])) if f[len(BASE_FEATURES):].sum() else -1
-    if wb>.16: return 2
-    if wb<-.16: return 3
+    # A turn action rotates up to ~28 degrees; a narrower dead zone than half of
+    # that can oscillate left/right forever around a waypoint.
+    if wb>.25: return 2
+    if wb<-.25: return 3
     # USE is edge-triggered in Doom: a movement-only action releases the key.
     if f[11]*128<60 and last not in (12,13): return 13
     if f[22]>.5 and f[11]*128>=60:

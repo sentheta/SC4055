@@ -455,9 +455,14 @@ class Navigator(LegacyNavigator):
             chosen=best[3] if mode=='trigger' else None
             if chosen!=self.trigger_goal: self.trigger_goal=chosen; self.trigger_since=self.calls
         else:
-            # Favor unvisited reachable regions, retaining travel-cost pressure.
-            goal=max(parent,key=lambda n:min(dist[n],40)/(1+self.visits[n[1],n[0]]*8))
-            self.goal=None; self.mode='explore'
+            goal=start; self.goal=None
+        if goal==start and self.goal is None:
+            # Nothing to aim at (or already there): favor unvisited reachable regions,
+            # retaining travel-cost pressure. Never return an empty path without a goal
+            # point, which would leave the waypoint on the player and spin it in place.
+            goal=max((n for n in parent if n!=start),default=start,
+                     key=lambda n:min(dist[n],40)/(1+self.visits[n[1],n[0]]*8))
+            self.mode='explore'; self.advance_goal=None
         path=[]
         while goal!=start:
             path.append(goal); goal=parent[goal]
