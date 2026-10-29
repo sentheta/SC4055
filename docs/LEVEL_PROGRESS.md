@@ -97,6 +97,42 @@ demons while holding the pistol (shells spent).
 Hand-tuned combat rules have plateaued around 60-65% teacher completion.
 The 16-seed estimate of 75% was optimistic; 32 seeds are needed to compare.
 
+### DAgger round 1 and two hidden bugs (23:00-00:30)
+
+`e1m2_d1` (DAgger: 50k student-driven + 50k teacher decisions, retrained)
+scored 0/20 although its in-training validation said 2/5. Tracing showed the
+student turning left/right forever on the spot, and the teacher agreeing 99%:
+
+1. **Turn oscillation in the teacher.** One turn action rotates up to ~28
+   degrees, but the waypoint dead zone was +/-0.16 rad (9 degrees). When a
+   waypoint fell between two reachable headings the teacher swung back and
+   forth forever. Dead zone widened to +/-0.25 rad (more than half a step).
+   This was also the cause of most remaining *teacher* timeouts.
+2. **Empty planner path without a goal point** could leave the waypoint on
+   the player. The planner now falls back to an exploration goal.
+
+Teacher after the turn fix: **26/32** (was 20/32), no timeouts; E1M1 and
+MAP01 still 20/20. Because the student copied the oscillation, every
+student must be retrained with the fixed teacher (`e1m2_v3`, 100k
+decisions).
+
+Lesson: a 3-5 episode in-training validation is not a reliable checkpoint
+signal on long levels; always evaluate saved checkpoints on 20+ seeds.
+
+## E1M3 (started 00:20, 30 Oct)
+
+One blue key, 42 triggers, 15 lifts, 15 damaging sectors (no radiation
+suit). The first exit is only reachable across nukage.
+
+| Change | Teacher result (6-8 seeds) |
+|---|---|
+| E1M2 planner as is | dies at ~330 steps in a nukage pit by the start |
+| Avoid damaging floors (blocked) | survives 600-2300 steps, still 0/6 |
+| Weighted crossing (cost 10), no drops into damaging pits, never a destination | 0/8; ~95% of damage is taken on nukage in the large north room |
+
+Open: the route through the north nukage room needs a short, high-health
+crossing; the teacher currently lingers there (trigger/explore goals).
+
 ### Open issues (22:36, 29 Oct)
 
 - 3/20 student seeds stall after the blue key with ~20 kills (planner loop).
