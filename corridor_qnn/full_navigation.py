@@ -262,7 +262,12 @@ class Navigator(LegacyNavigator):
         for sid,(lo,hi) in self.lift_boxes.items():
             # Stand inside the ring of a lift's walk triggers, so stepping off does not lower it under us.
             ring=[t['mid'] for t in self.triggers if t['kind']=='walk' and sid in t['targets']]
-            self.lift_centers[sid]=np.mean(ring,0) if len(ring)>=3 else (lo+hi)/2
+            if self.version=='improved2':
+                # Lifts sharing a tag share their trigger lines: keep only this lift's ring.
+                ring=[m for m in ring if np.all(m>=lo-96) and np.all(m<=hi+96)]
+            centre=np.mean(ring,0) if len(ring)>=3 else (lo+hi)/2
+            if self.version=='improved2' and not (np.all(centre>=lo) and np.all(centre<=hi)): centre=(lo+hi)/2
+            self.lift_centers[sid]=centre
         # Cells inside damaging sectors (even-odd test against each sector's edges).
         self.hazard=np.zeros_like(self.blocked)
         edges={}
