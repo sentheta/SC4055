@@ -133,6 +133,23 @@ with unlimited detours below 70.
 Remaining teacher failures: 3 deaths, 1 timeout in 64. Students are
 retrained with this teacher (`e1m2_v4`).
 
+### E1M2 target reached: QNN `e1m2_v3` 94% (01:55)
+
+`e1m2_v3`: 100k decisions from the turn-fixed teacher (21 completed, 3
+deaths, 1 cut-off episode), corridor initialisation, 12 epochs, epoch 12
+selected. Evaluated with the current planner (health threshold 90), which
+the student follows through its waypoint features:
+
+| Seeds | Completed | Deaths | Timeouts |
+|---|---|---|---|
+| 800-819 | 19/20 | 0 | 1 |
+| 820-869 | 47/50 | 2 | 1 |
+| **Total** | **66/70 (94%)** | 2 | 2 |
+
+PennyLane parity: circuit outputs within 6.6e-7, argmax action identical on
+2000 recorded states. Full torch and PennyLane gameplay re-runs and
+artifacts: `results/levels/E1M2/e1m2_v3/`.
+
 Survey of later maps with this teacher (4 seeds each, 8000 steps): E1M4,
 E1M5, E1M6 and E1M8 end in deaths (combat-heavy, 20-60 kills), E1M7 and
 E1M9 time out with ~2-9 kills (navigation). Combat is the common bottleneck
