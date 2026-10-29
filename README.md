@@ -67,6 +67,32 @@ recording behavior and campaign semantics, and
 reproduction commands. Deadly Corridor commands below retain their original
 behavior.
 
+## Freedoom Phase 1 levels (E1Mx)
+
+Doom 1-style map names (`--map E1M1` to `E4M9`) load the bundled
+`freedoom1.wad`. The planner handles key-locked doors, lifts, switch- and
+walk-triggered sectors (live engine heights), one-way drops and damaging
+floors. Trained QNN checkpoints with their training history, torch and
+PennyLane evaluations and GIFs are in `results/levels/`:
+
+| Map | QNN completion | PennyLane re-run |
+|---|---|---|
+| E1M1 | 49/50 | 50/50 episodes identical |
+| E1M2 | 66/70 (94%) | 20/20 episodes identical |
+
+```bash
+python -m corridor_qnn full-eval --policy quantum --map E1M2 --auto-weapon \
+  --max-steps 8000 --episodes 20 --seed 800 \
+  --checkpoint results/levels/E1M2/e1m2_v3/quantum.pt --output-dir outputs/e1m2_check
+python scripts/pennylane-check.py eval results/levels/E1M2/e1m2_v3/quantum.pt \
+  --policy quantum --map E1M2 --auto-weapon --max-steps 8000 --episodes 20 \
+  --seed 800 --output-dir outputs/e1m2_check_pennylane
+```
+
+The method, every experiment (including the ones that did not help) and the
+open issues on E1M3 and later maps are logged in
+[docs/LEVEL_PROGRESS.md](docs/LEVEL_PROGRESS.md).
+
 ## Architecture
 
 - RGB frames at 320 × 240 are converted to 64 × 96 grayscale and normalized
