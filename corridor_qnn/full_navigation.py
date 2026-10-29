@@ -434,13 +434,15 @@ class Navigator(LegacyNavigator):
             front=(points-mid)@normal>20
             for i in np.flatnonzero(front & (distance<32)):
                 choices.append((dist[nodes[i]]+distance[i]/self.cell,nodes[i],mid))
-        if not choices and self.health<70:
+        # Top up before pushing on: fixed ambushes (monster closets, key traps) kill a
+        # weakened player. 64 seeds: 94% completion versus 77% with a threshold of 70.
+        if not choices and self.health<90:
             # Low health: detour to the nearest reachable health item not yet taken.
             for k,pos in enumerate(self.health_items):
                 if k in self.taken: continue
                 for i in np.flatnonzero(np.linalg.norm(points-pos,axis=1)<48):
                     # The more hurt, the longer the detour worth taking.
-                    limit=60 if self.health>=60 else 150 if self.health>=45 else np.inf
+                    limit=60 if self.health>=70 else np.inf
                     if dist[nodes[i]]<limit: choices.append((dist[nodes[i]],nodes[i],pos,k))
             mode='health'
         if not choices:
@@ -511,7 +513,7 @@ class Navigator(LegacyNavigator):
         xy=np.asarray(xy); node=self.grid(xy)
         self.calls+=1
         if health is not None:
-            if (health<70)!=(self.health<70): self.path=[]
+            if (health<90)!=(self.health<90): self.path=[]
             self.health=health
         for k,pos in enumerate(self.health_items):
             if k in self.taken: continue
