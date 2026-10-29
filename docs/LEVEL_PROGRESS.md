@@ -155,6 +155,26 @@ E1M5, E1M6 and E1M8 end in deaths (combat-heavy, 20-60 kills), E1M7 and
 E1M9 time out with ~2-9 kills (navigation). Combat is the common bottleneck
 after E1M2.
 
+### DAgger round 2: `e1m2_d2` (03:45-04:20)
+
+A further 100 seeds put `e1m2_v3` at 87/100, so 153/170 (90.0%) overall:
+just at the target. One DAgger round to add margin:
+
+- 4 parallel student-driven collections from `e1m2_v3` (seeds 1000-4000,
+  12.5k decisions each, teacher labels), merged with v3's 100k teacher
+  decisions (150k samples, 36 episodes).
+- Fine-tuned from `e1m2_v3` (lr 2e-4, 3 epochs) instead of retraining.
+
+| Seeds 870-969 | Completed | Deaths |
+|---|---|---|
+| e1m2_v3 | 87/100 | 8 |
+| e1m2_d2 | **91/100** | 2 |
+
+On seeds 800-869 `e1m2_d2` scores 61/70 (v3: 66/70), so overall **152/170
+(89.4%)** against v3's 153/170 (90.0%): no measurable gain. Its torch and
+PennyLane re-runs (seeds 800-819) agree exactly (17/20 each, 20/20 episodes
+identical). `e1m2_v3` remains the exported E1M2 model.
+
 ## E1M3 (started 00:20, 30 Oct)
 
 One blue key, 42 triggers, 15 lifts, 15 damaging sectors (no radiation
