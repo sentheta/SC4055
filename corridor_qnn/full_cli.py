@@ -28,6 +28,7 @@ def add_commands(sp):
         p.add_argument('--output-dir',type=Path,default=ROOT)
         p.add_argument('--navigation',choices=('legacy','improved'),default='improved')
         p.add_argument('--teacher-version',choices=('legacy','improved'),default='improved')
+        p.add_argument('--auto-weapon',action='store_true',help='Environment switches to the shotgun when it has shells')
         if command in ('full-eval','full-campaign'):
             p.add_argument('--policy',choices=('random','teacher','quantum','classical'),default='quantum')
             p.add_argument('--checkpoint',type=Path)
@@ -58,7 +59,7 @@ def add_commands(sp):
 def environment(args, map=None):
     return FullDoom(map=map or args.map,skill=args.skill,frame_skip=args.frame_skip,
                     max_steps=args.max_steps,seed=args.seed,iwad=args.iwad,secret_maps=args.secret_maps,
-                    navigation=getattr(args,'navigation','improved'))
+                    navigation=getattr(args,'navigation','improved'),auto_weapon=getattr(args,'auto_weapon',False))
 
 
 def json_write(path,data):
@@ -124,6 +125,7 @@ def evaluate(args, model=None, seeds=None, write=True):
     summary=dict(policy=args.policy,map=args.map,skill=args.skill,seeds=seeds,episodes=len(seeds),
                  navigation=getattr(args,'navigation','improved'),teacher_version=getattr(args,'teacher_version','improved'),
                  quantum_disabled=getattr(args,'quantum_disabled',False),
+                 auto_weapon=getattr(args,'auto_weapon',False),
                  max_steps=args.max_steps,frame_skip=args.frame_skip,**identity,
                  completion_rate=float(np.mean([r['completed'] for r in records])),
                  death_rate=float(np.mean([r['death'] for r in records])),
@@ -216,6 +218,7 @@ def train(args):
     initial_quantum=model.core.weights.detach().clone() if args.model=='quantum' else None
     metadata=dict(training='full-game behavior cloning',collected_decisions=collected,samples=len(labels),
                   map=args.map,skill=args.skill,seed=args.seed,validation_seed=args.validation_seed,
+                  auto_weapon=args.auto_weapon,max_steps=args.max_steps,
                   transferred_keys=transferred,collection=collection,history=[],
                   dataset=str(args.dataset or dataset_path), validation_episodes=args.validation_episodes)
     validation_args=SimpleNamespace(**vars(args))

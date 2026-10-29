@@ -17,6 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
+pennylane = ["pennylane>=0.40,<1"]
 
 [project.scripts]
 doom-corridor = "corridor_qnn.__main__:main"

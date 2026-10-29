@@ -302,7 +302,7 @@ class Navigator(LegacyNavigator):
         self.heights=[h[:] for h in self.static_heights]; self.dynamic_state=None
         self.dyn_blocked=np.zeros_like(self.blocked); self.dropping=False; self._update_dynamic()
         self.last_xy=None
-        for t in self.triggers: t['until']=0
+        for t in self.triggers: t['until']=0; t['pending']=None
         self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.used_targets=set()
         self.known_reach=set(); self.taken=set(); self.health=100; self.advance_goal=None
         self.gain_cache={}; self.health_since=0
@@ -493,6 +493,11 @@ class Navigator(LegacyNavigator):
                 self.mode='ride'; self.path=[]
                 return self.lift_centers[sid],1e6
         for t in self.triggers:
+            if t['pending'] is not None:
+                # A press only counts once a target sector actually moves; otherwise retry later.
+                deadline,base=t['pending']
+                if [tuple(self.heights[i]) for i in sorted(t['targets'])]!=base: t['pending']=None
+                elif self.calls>=deadline: t['pending']=None; t['until']=0; self.path=[]
             if t['until']>self.calls: continue
             delta=t['q']-t['p']; s=np.clip(np.dot(xy-t['p'],delta)/max(np.dot(delta,delta),1),0,1)
             d=np.linalg.norm(xy-(t['p']+s*delta))
@@ -508,6 +513,8 @@ class Navigator(LegacyNavigator):
                 fired=before*after<=0 and before!=after and 0<s<1
             if fired:
                 t['until']=np.inf if t['once'] else self.calls+300; self.path=[]; self.used_targets|=t['targets']
+                if t['kind']!='teleport':
+                    t['pending']=(self.calls+60,[tuple(self.heights[i]) for i in sorted(t['targets'])])
             elif id(t)!=self.trigger_goal or self.mode!='trigger': continue
             elif d>96: self.trigger_since=self.calls  # still travelling; the clock starts on arrival
             elif self.calls-self.trigger_since>150:

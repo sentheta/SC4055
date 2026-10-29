@@ -9,7 +9,9 @@
 /core.*
 *.pt
 !/pretrained/*.pt
+!/results/levels/**/*.pt
 *.gif
+!/results/levels/**/*.gif
 *.mp4
 *.lmp
 # Python environments, packaging and caches

@@ -44,10 +44,13 @@ def shape_reward(before, after, new_cell, outcome):
 
 class FullDoom:
     def __init__(self, map='MAP01', skill=1, frame_skip=4, max_steps=1000,
-                 seed=42, iwad=None, secret_maps=False, visible=False, navigation='improved'):
+                 seed=42, iwad=None, secret_maps=False, visible=False, navigation='improved',
+                 auto_weapon=False):
         import vizdoom as vzd
         self._settings=dict(map=map,skill=skill,frame_skip=frame_skip,max_steps=max_steps,
-                            seed=seed,iwad=iwad,secret_maps=secret_maps,visible=visible,navigation=navigation)
+                            seed=seed,iwad=iwad,secret_maps=secret_maps,visible=visible,navigation=navigation,
+                            auto_weapon=auto_weapon)
+        self.auto_weapon=auto_weapon
         self._recording=False
         self.map = map_name(map, secret_maps)
         if not 1 <= skill <= 5 or min(frame_skip,max_steps)<1:
@@ -165,6 +168,9 @@ class FullDoom:
             raise ValueError('Invalid full-game action')
         before=dict(self.v)
         before_tics=self.game.get_episode_time()
+        if getattr(self,'auto_weapon',False) and before['SELECTED_WEAPON']<3 and before['WEAPON3']>0 and before['AMMO3']>0:
+            # Environment rule, not a learned action: hold the shotgun whenever it has shells.
+            self.game.send_game_command('use Shotgun')
         raw=float(self.game.make_action(self.actions[action],self.frame_skip))
         self.steps+=1; self.last_action=action
         finished=self.game.is_episode_finished()
