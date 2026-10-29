@@ -480,8 +480,11 @@ class Navigator(LegacyNavigator):
         if not choices:
             # Sealed area: activate the most useful reachable trigger, then replan on new heights.
             # One-step lookahead: open the trigger's target sectors and measure what becomes reachable.
+            # Trapped on a damaging floor with no safe cell: retry escape triggers regardless of cooldown.
+            trapped=(self.version=='improved2' and self.hazard[start[1],start[0]]
+                     and all(self.hazard[n[1],n[0]] for n in parent))
             for t in self.triggers:
-                if t['until']>self.calls: continue
+                if t['until']>self.calls and not (trapped and t['pending'] is None): continue
                 if t['kind']=='switch':
                     near=(np.linalg.norm(points-(t['mid']+t['normal']*40),axis=1)<32)&((points-t['mid'])@t['normal']>20)
                     goals=[t['mid']]*len(points)
@@ -581,6 +584,11 @@ class Navigator(LegacyNavigator):
                 t['until']=np.inf if t['once'] else self.calls+300; self.path=[]; self.used_targets|=t['targets']
                 if t['kind']!='teleport':
                     t['pending']=(self.calls+60,[tuple(self.heights[i]) for i in sorted(t['targets'])])
+                if self.version=='improved2':
+                    # Another switch for the same lift would just send it back: share the cooldown.
+                    for other in self.triggers:
+                        if other is not t and other['targets']==t['targets'] and not other['once']:
+                            other['until']=max(other['until'],self.calls+300)
             elif id(t)!=self.trigger_goal or self.mode!='trigger': continue
             elif d>96: self.trigger_since=self.calls  # still travelling; the clock starts on arrival
             elif self.calls-self.trigger_since>150:
