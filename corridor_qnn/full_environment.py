@@ -62,8 +62,8 @@ class FullDoom:
         if not self.iwad.is_file():
             raise FileNotFoundError(f'IWAD absent: {self.iwad}; supply --iwad PATH')
         self.navigation=navigation
-        if navigation not in ('legacy','improved'): raise ValueError('Unknown navigation version')
-        self.navigator=(LegacyNavigator if navigation=='legacy' else Navigator)(self.iwad,self.map)
+        if navigation not in ('legacy','improved','improved2'): raise ValueError('Unknown navigation version')
+        self.navigator=LegacyNavigator(self.iwad,self.map) if navigation=='legacy' else Navigator(self.iwad,self.map,navigation)
         self.iwad_hash=hashlib.sha256(self.iwad.read_bytes()).hexdigest()
         self.game=vzd.DoomGame()
         try:
@@ -77,7 +77,7 @@ class FullDoom:
             self.game.set_screen_resolution(vzd.ScreenResolution.RES_320X240)
             self.game.set_labels_buffer_enabled(True)
             self.game.set_objects_info_enabled(True)
-            self.game.set_sectors_info_enabled(navigation=='improved')
+            self.game.set_sectors_info_enabled(navigation!='legacy')
             self.game.set_depth_buffer_enabled(True)
             self.game.set_automap_buffer_enabled(True)
             self.game.set_audio_buffer_enabled(False)

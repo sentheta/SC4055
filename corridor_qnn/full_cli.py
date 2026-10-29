@@ -26,7 +26,8 @@ def add_commands(sp):
         p.add_argument('--max-steps',type=int,default=1000)
         p.add_argument('--seed',type=int,default=800 if command!='full-train' else 42)
         p.add_argument('--output-dir',type=Path,default=ROOT)
-        p.add_argument('--navigation',choices=('legacy','improved'),default='improved')
+        p.add_argument('--navigation',choices=('legacy','improved','improved2'),default='improved',
+                       help='improved2 adds hazard escapes and squared-up switch presses (E1M3+)')
         p.add_argument('--teacher-version',choices=('legacy','improved'),default='improved')
         p.add_argument('--auto-weapon',action='store_true',help='Environment switches to the shotgun when it has shells')
         if command in ('full-eval','full-campaign'):

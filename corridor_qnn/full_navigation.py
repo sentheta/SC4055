@@ -178,7 +178,10 @@ class Navigator(LegacyNavigator):
                      55, 56, 57, 58, 59, 71, 100, 101, 102, 103, 104, 108, 109, 110,
                      111, 112, 113, 119, 121, 122, 127, 130, 131, 133, 135, 137, 140, 141}
 
-    def __init__(self, path, name):
+    def __init__(self, path, name, version='improved'):
+        # 'improved2' behaviour is opt-in so checkpoints trained on 'improved' see the
+        # same waypoints they were trained on.
+        self.version = version
         verts, lines, sides, sectors = read_map(path, name)
         xy = np.asarray(verts, dtype=float)
         self.origin = xy.min(0)-96
@@ -412,10 +415,20 @@ class Navigator(LegacyNavigator):
 
     def route(self,start):
         if not self.free(start):
-            candidates=[(start[0]+x,start[1]+y) for x in range(-3,4) for y in range(-3,4)]
-            good=[n for n in candidates if self.free(n)]
+            # The clearance raster can mark a narrow channel (or a temporary block) as
+            # occupied: plan from the nearest free cell, and walk to it first.
+            good=[]
+            for r in ((3,8) if self.version=='improved2' else (3,)):
+                good=[(start[0]+x,start[1]+y) for x in range(-r,r+1) for y in range(-r,r+1)
+                      if self.free((start[0]+x,start[1]+y))]
+                if good: break
             if not good: return []
-            start=min(good,key=lambda n:np.linalg.norm(np.asarray(n)-start))
+            nearest=min(good,key=lambda n:np.linalg.norm(np.asarray(n)-start))
+            if self.version!='improved2':
+                start=nearest
+            else:
+                path=self.route(nearest)
+                return [nearest]+path if nearest!=start else path
         parent,dist=self._search(start)
         if len(parent)<30 and self.dyn_blocked.any():
             # Stranded on a raised platform: stepping down is allowed although stepping up is not.
@@ -501,8 +514,15 @@ class Navigator(LegacyNavigator):
             # Nothing to aim at (or already there): favor unvisited reachable regions,
             # retaining travel-cost pressure. Never return an empty path without a goal
             # point, which would leave the waypoint on the player and spin it in place.
-            goal=max((n for n in parent if n!=start and not self.hazard[n[1],n[0]]),default=start,
-                     key=lambda n:min(dist[n],40)/(1+self.visits[n[1],n[0]]*8))
+            if self.version=='improved2' and self.hazard.any() and not self.hazard[start[1],start[0]]:
+                # Exploring never justifies damage: search again with damaging floors excluded.
+                self.avoid_hazard=True; parent,dist=self._search(start); self.avoid_hazard=False
+            if self.version=='improved2' and self.hazard[start[1],start[0]]:
+                # Standing on a damaging floor with nothing to do: step off it first.
+                goal=min((n for n in parent if not self.hazard[n[1],n[0]]),default=start,key=lambda n:dist[n])
+            else:
+                goal=max((n for n in parent if n!=start and not self.hazard[n[1],n[0]]),default=start,
+                         key=lambda n:min(dist[n],40)/(1+self.visits[n[1],n[0]]*8))
             self.mode='explore'; self.advance_goal=None
         path=[]
         while goal!=start:
@@ -595,6 +615,11 @@ class Navigator(LegacyNavigator):
             target=point
         if self.goal is not None and np.linalg.norm(xy-self.goal)<72:
             target=self.goal.copy()
+            switch=next((t for t in self.triggers if id(t)==self.trigger_goal and t['kind']=='switch'),None)
+            if self.version=='improved2' and self.mode=='trigger' and switch is not None and (xy-switch['p'])@switch['normal']>0:
+                # Close to a switch the bearing to its midpoint swings wildly; aim through
+                # the wall instead so the player squares up and the USE ray hits it.
+                target=switch['mid']-switch['normal']*48
         # Pressing USE on a moving door reverses it; hide use targets until it opens.
         if last_action in (12,13): self.use_wait=self.calls+12
         near=1e6
