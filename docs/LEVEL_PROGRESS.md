@@ -190,7 +190,7 @@ that completes the level.
 | Map | Teacher | QNN student | Torch vs PennyLane | Artifacts |
 |---|---|---|---|---|
 | E1M1 | 20/20 | 49/50 (`e1m1_v4`) | 50/50 episodes identical | `results/levels/E1M1/e1m1_v4/` |
-| E1M2 | 60/64 (94%) | **66/70 (94%)** (`e1m2_v3`) | 20/20 episodes identical | `results/levels/E1M2/e1m2_v3/` |
+| E1M2 | 60/64 (94%) | **153/170 (90.0%)** (`e1m2_v3`; 66/70 on seeds 800-869, 87/100 on 870-969) | 20/20 episodes identical | `results/levels/E1M2/e1m2_v3/` |
 | E1M3 | 0/8 | not trained | - | - |
 | E1M4-E1M9 | 0/4 each (survey) | not trained | - | - |
 

@@ -78,7 +78,7 @@ PennyLane evaluations and GIFs are in `results/levels/`:
 | Map | QNN completion | PennyLane re-run |
 |---|---|---|
 | E1M1 | 49/50 | 50/50 episodes identical |
-| E1M2 | 66/70 (94%) | 20/20 episodes identical |
+| E1M2 | 153/170 (90.0%) | 20/20 episodes identical |
 
 ```bash
 python -m corridor_qnn full-eval --policy quantum --map E1M2 --auto-weapon \

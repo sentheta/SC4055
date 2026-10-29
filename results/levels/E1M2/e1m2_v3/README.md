@@ -33,6 +33,8 @@ GIFs: qnn_E1M2_seed800.gif, qnn_E1M2_seed805.gif
 - Wider check with the same code (parallel evaluator, seeds 820-869):
   47/50 completed, 2 deaths, 1 timeout. Combined with the 20 seeds above:
   66/70 (94%).
+- Further 100 seeds (870-969, `eval_extra_seeds870-969.txt`): 87/100
+  (8 deaths, 5 timeouts). **All 170 seeds: 153/170 (90.0%).**
 - `pennylane_parity.txt`: circuit and logit agreement on 2000 recorded states.
 - Reproduce: `python -m corridor_qnn full-eval --policy quantum --map E1M2
   --auto-weapon --max-steps 8000 --episodes 20 --seed 800 --checkpoint

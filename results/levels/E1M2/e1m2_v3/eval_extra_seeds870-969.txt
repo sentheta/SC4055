@@ -1,0 +1,401 @@
+[W][03:19:16.494472] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[W][03:19:16.494472] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:16.495828] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[E][03:19:16.497316] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:17.831068] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:17.832701] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:17.838572] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:17.840671] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:18.162437] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:18.163940] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:18.166073] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:18.167568] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:19.369200] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[W][03:19:19.370027] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:19.370128] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[E][03:19:19.370961] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:21.423403] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:21.424173] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:19:21.443516] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:19:21.444329] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:06.325533] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:06.326562] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:06.386109] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:06.387266] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:11.182533] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:11.183671] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:20.408491] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:20.409390] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:26.389919] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:26.390886] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:28.287943] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:28.288930] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:31.756759] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:31.757932] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:39.567827] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:39.568742] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:44.280999] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:44.282291] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:47.971966] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:47.973349] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:21:55.305192] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:21:55.306292] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:22:55.340572] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:22:55.342886] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:23:16.448611] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:23:16.452398] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:23:40.238057] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:23:40.239098] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:23:51.036585] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:23:51.037705] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:24:08.066807] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:24:08.068615] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:24:08.587156] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:24:08.588445] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:03.062754] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:03.063687] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:16.669278] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:16.670121] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:30.197749] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:30.198600] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:33.965453] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:33.966252] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:34.020894] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:34.022154] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:25:35.915527] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:25:35.916643] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:26:14.225326] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:26:14.226512] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:26:18.937018] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:26:18.938056] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:26:22.395506] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:26:22.396879] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:26:23.630897] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:26:23.631931] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:26:25.388159] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:26:25.389065] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:27:16.063128] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:27:16.064190] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:27:25.968699] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:27:25.969815] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:27:38.917861] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:27:38.918773] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:27:49.846935] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:27:49.847722] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:28:01.928713] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:28:01.929700] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:28:04.093547] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:28:04.094575] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:28:28.840207] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:28:28.841360] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:28:33.865873] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:28:33.868489] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:28:40.102644] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:28:40.103621] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:29:18.887550] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:29:18.888414] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:29:35.231109] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:29:35.232131] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:29:54.795292] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:29:54.796319] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:30:04.355026] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:30:04.356098] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:30:05.452161] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:30:05.455672] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:30:20.639498] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:30:20.640324] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:30:39.363890] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:30:39.365453] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:31:09.057278] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:31:09.058306] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:31:45.011443] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:31:45.012344] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:31:46.227696] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:31:46.228705] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:31:48.085908] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:31:48.086965] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:31:59.115648] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:31:59.116713] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:32:06.719364] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:32:06.720501] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:32:16.850657] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:32:16.851680] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:32:24.094969] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:32:24.096120] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:32:56.033953] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:32:56.035043] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:33:24.612795] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:33:24.613936] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:33:30.619353] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:33:30.620785] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:33:42.325643] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:33:42.326699] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:33:44.478235] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:33:44.480024] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:33:45.707828] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:33:45.709968] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:34:38.529948] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:34:38.530798] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:34:46.612048] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:34:46.613398] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:35:08.329326] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:35:08.330323] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:35:23.245173] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:35:23.246148] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:35:41.633867] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:35:41.634966] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:03.007873] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:03.008720] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:05.599523] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:05.600616] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:32.921309] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:32.922283] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:36.049776] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:36.050970] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:49.445297] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:49.446606] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:36:58.365872] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:36:58.366898] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:37:08.044781] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:37:08.045537] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:37:17.033793] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:37:17.034939] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:38:15.695365] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:38:15.696050] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:38:17.422926] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:38:17.424107] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:38:48.172763] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:38:48.173576] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:38:53.079358] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:38:53.080264] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:38:55.740128] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:38:55.741115] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:39:10.194351] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:39:10.195436] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:39:12.975018] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:39:12.976009] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:39:14.799942] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:39:14.800905] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:39:15.051011] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:39:15.052055] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:40:03.653136] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:40:03.654204] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:40:20.478190] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:40:20.479099] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:40:21.479553] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:40:21.480882] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:40:30.668555] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:40:30.669459] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:41:00.762438] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:41:00.763461] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:41:19.385382] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:41:19.386430] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:41:37.924252] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:41:37.925331] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:41:43.702344] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:41:43.703502] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:42:07.816568] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:42:07.817449] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+[W][03:42:31.069147] pw.conf      | [          conf.c: 1182 try_load_conf()] can't load config client.conf: No such file or directory
+[E][03:42:31.069722] pw.conf      | [          conf.c: 1215 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+[ALSOFT] (EE) Failed to create PipeWire event context (errno: 2)
+870 completed 4514 45.0 {'blue': 1463, 'red': 3052, 'yellow': 4434}
+871 completed 4561 54.0 {'blue': 1322, 'red': 3049, 'yellow': 4491}
+872 completed 3650 47.0 {'blue': 1387, 'red': 2491, 'yellow': 3571}
+873 completed 5219 57.0 {'blue': 771, 'red': 2922, 'yellow': 5142}
+874 completed 3834 56.0 {'blue': 1306, 'red': 2285, 'yellow': 3758}
+875 completed 4018 55.0 {'blue': 762, 'red': 2417, 'yellow': 3912}
+876 completed 4462 55.0 {'blue': 956, 'red': 3064, 'yellow': 4373}
+877 completed 5750 56.0 {'blue': 1490, 'red': 4462, 'yellow': 5649}
+878 death 1897 22.0 {'blue': 996}
+879 completed 4569 56.0 {'blue': 802, 'red': 2793, 'yellow': 4511}
+880 completed 3467 56.0 {'blue': 608, 'red': 2131, 'yellow': 3384}
+881 completed 5922 56.0 {'blue': 1632, 'red': 3665, 'yellow': 5775}
+882 completed 3610 56.0 {'blue': 654, 'red': 1867, 'yellow': 3511}
+883 completed 3954 53.0 {'blue': 841, 'red': 2771, 'yellow': 3874}
+884 completed 4545 55.0 {'blue': 737, 'red': 3153, 'yellow': 4442}
+885 completed 3887 53.0 {'blue': 994, 'red': 2475, 'yellow': 3748}
+886 completed 4361 54.0 {'blue': 757, 'red': 2166, 'yellow': 4204}
+887 completed 3796 57.0 {'blue': 862, 'red': 2417, 'yellow': 3723}
+888 completed 4747 53.0 {'blue': 1300, 'red': 3142, 'yellow': 4659}
+889 completed 6595 57.0 {'blue': 825, 'red': 2743, 'yellow': 6490}
+890 completed 3492 54.0 {'blue': 673, 'red': 2218, 'yellow': 3367}
+891 completed 4056 56.0 {'blue': 892, 'red': 2503, 'yellow': 3896}
+892 death 1875 30.0 {'blue': 1033}
+893 completed 6158 57.0 {'blue': 1250, 'red': 3295, 'yellow': 6043}
+894 completed 3711 53.0 {'blue': 1022, 'red': 2579, 'yellow': 3615}
+895 death 3416 46.0 {'blue': 1244, 'red': 2758}
+896 completed 4296 54.0 {'blue': 948, 'red': 2895, 'yellow': 4231}
+897 completed 5596 56.0 {'blue': 1131, 'red': 2928, 'yellow': 5466}
+898 completed 5363 55.0 {'blue': 1950, 'red': 3879, 'yellow': 5296}
+899 completed 4319 47.0 {'blue': 1790, 'red': 3169, 'yellow': 4266}
+900 timeout 8000 15.0 {'blue': 7858}
+901 completed 4123 49.0 {'blue': 1310, 'red': 2775, 'yellow': 4021}
+902 completed 5416 57.0 {'blue': 781, 'red': 2291, 'yellow': 5326}
+903 completed 4476 57.0 {'blue': 716, 'red': 1995, 'yellow': 4357}
+904 completed 4166 55.0 {'blue': 920, 'red': 2358, 'yellow': 4037}
+905 completed 3258 46.0 {'blue': 982, 'red': 2019, 'yellow': 3176}
+906 completed 4384 55.0 {'blue': 654, 'red': 2815, 'yellow': 4313}
+907 completed 3989 55.0 {'blue': 939, 'red': 2670, 'yellow': 3880}
+908 completed 5046 57.0 {'blue': 946, 'red': 2250, 'yellow': 4781}
+909 completed 3085 46.0 {'blue': 618, 'red': 1717, 'yellow': 3039}
+910 completed 4503 57.0 {'blue': 808, 'red': 2063, 'yellow': 4419}
+911 completed 3871 47.0 {'blue': 976, 'red': 2255, 'yellow': 3789}
+912 completed 3194 45.0 {'blue': 867, 'red': 2044, 'yellow': 3052}
+913 completed 5061 57.0 {'blue': 761, 'red': 1803, 'yellow': 4977}
+914 completed 5284 56.0 {'blue': 1096, 'red': 3122, 'yellow': 5174}
+915 death 6302 50.0 {'blue': 1312, 'red': 5009}
+916 completed 7679 57.0 {'blue': 1881, 'red': 3665, 'yellow': 7497}
+917 completed 7391 49.0 {'blue': 1876, 'red': 3517, 'yellow': 7318}
+918 completed 4500 54.0 {'blue': 1328, 'red': 3131, 'yellow': 4437}
+919 death 1799 18.0 {'blue': 1133}
+920 completed 4120 57.0 {'blue': 997, 'red': 2526, 'yellow': 4041}
+921 completed 4849 57.0 {'blue': 878, 'red': 2130, 'yellow': 4771}
+922 completed 4613 49.0 {'blue': 746, 'red': 2120, 'yellow': 4507}
+923 completed 5420 56.0 {'blue': 934, 'red': 2662, 'yellow': 5319}
+924 completed 5466 53.0 {'blue': 1380, 'red': 4344, 'yellow': 5394}
+925 completed 5055 57.0 {'blue': 751, 'red': 1878, 'yellow': 4966}
+926 completed 3928 55.0 {'blue': 717, 'red': 1828, 'yellow': 3847}
+927 completed 5071 54.0 {'blue': 1660, 'red': 3883, 'yellow': 5010}
+928 death 5582 49.0 {'blue': 1362, 'red': 4558}
+929 timeout 8000 51.0 {'blue': 1081, 'red': 5834}
+930 completed 3757 57.0 {'blue': 755, 'red': 1796, 'yellow': 3652}
+931 completed 5179 56.0 {'blue': 883, 'red': 3077, 'yellow': 5108}
+932 completed 4549 55.0 {'blue': 1027, 'red': 2637, 'yellow': 4396}
+933 completed 4233 54.0 {'blue': 861, 'red': 2784, 'yellow': 4148}
+934 death 1522 19.0 {'blue': 915}
+935 completed 3821 54.0 {'blue': 857, 'red': 2436, 'yellow': 3695}
+936 completed 5271 55.0 {'blue': 2445, 'red': 3742, 'yellow': 5182}
+937 completed 3850 46.0 {'blue': 1563, 'red': 2844, 'yellow': 3801}
+938 completed 4618 54.0 {'blue': 1120, 'red': 3043, 'yellow': 4512}
+939 completed 4258 55.0 {'blue': 1086, 'red': 3183, 'yellow': 4175}
+940 completed 4994 57.0 {'blue': 1200, 'red': 2275, 'yellow': 4929}
+941 completed 3803 49.0 {'blue': 810, 'red': 2441, 'yellow': 3730}
+942 completed 3944 48.0 {'blue': 1090, 'red': 2355, 'yellow': 3826}
+943 completed 5724 43.0 {'blue': 2822, 'red': 4575, 'yellow': 5659}
+944 completed 2995 57.0 {'blue': 832, 'red': 2010, 'yellow': 2910}
+945 completed 5392 55.0 {'blue': 1089, 'red': 2886, 'yellow': 5299}
+946 completed 5503 57.0 {'blue': 1896, 'red': 2993, 'yellow': 5384}
+947 completed 6253 57.0 {'blue': 1927, 'red': 4058, 'yellow': 6137}
+948 completed 5139 56.0 {'blue': 1512, 'red': 3231, 'yellow': 5024}
+949 completed 4194 57.0 {'blue': 733, 'red': 2493, 'yellow': 4072}
+950 completed 5725 57.0 {'blue': 2412, 'red': 3903, 'yellow': 5662}
+951 completed 7169 55.0 {'blue': 1682, 'red': 5433, 'yellow': 7068}
+952 timeout 8000 52.0 {'blue': 1450, 'red': 6371}
+953 completed 7028 56.0 {'blue': 1265, 'red': 5428, 'yellow': 6905}
+954 timeout 8000 39.0 {'blue': 2453, 'red': 7903}
+955 timeout 8000 24.0 {'blue': 759}
+956 completed 4965 54.0 {'blue': 866, 'red': 3448, 'yellow': 4881}
+957 completed 6543 56.0 {'blue': 2201, 'red': 4989, 'yellow': 6462}
+958 completed 4139 56.0 {'blue': 841, 'red': 2776, 'yellow': 4034}
+959 completed 4925 55.0 {'blue': 1900, 'red': 3791, 'yellow': 4844}
+960 completed 5693 56.0 {'blue': 917, 'red': 2556, 'yellow': 5540}
+961 death 4041 45.0 {'blue': 1506, 'red': 3221}
+962 completed 5121 57.0 {'blue': 1643, 'red': 2705, 'yellow': 5017}
+963 completed 3465 54.0 {'blue': 936, 'red': 2315, 'yellow': 3344}
+964 completed 3986 57.0 {'blue': 1811, 'red': 2914, 'yellow': 3935}
+965 completed 3114 55.0 {'blue': 850, 'red': 1960, 'yellow': 3017}
+966 completed 4405 57.0 {'blue': 1339, 'red': 2585, 'yellow': 4329}
+967 completed 3928 55.0 {'blue': 842, 'red': 2664, 'yellow': 3822}
+968 completed 4825 47.0 {'blue': 1449, 'red': 3282, 'yellow': 4749}
+969 completed 3937 53.0 {'blue': 1349, 'red': 2839, 'yellow': 3839}
+completed 87 / 100 | deaths 8
