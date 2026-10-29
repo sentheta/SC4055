@@ -119,6 +119,25 @@ decisions).
 Lesson: a 3-5 episode in-training validation is not a reliable checkpoint
 signal on long levels; always evaluate saved checkpoints on 20+ seeds.
 
+### Teacher reaches 94% (01:13)
+
+With the turn fix in place, the earlier "heal before pushing on" variant
+was re-tested and is now decisive: health goals start below 90 (was 70),
+with unlimited detours below 70.
+
+| Teacher | Seeds 800-831 | Seeds 832-863 | Total |
+|---|---|---|---|
+| Health threshold 70 | 26/32 | 23/32 | 49/64 (77%) |
+| Health threshold 90 | 30/32 | 30/32 | **60/64 (94%)** |
+
+Remaining teacher failures: 3 deaths, 1 timeout in 64. Students are
+retrained with this teacher (`e1m2_v4`).
+
+Survey of later maps with this teacher (4 seeds each, 8000 steps): E1M4,
+E1M5, E1M6 and E1M8 end in deaths (combat-heavy, 20-60 kills), E1M7 and
+E1M9 time out with ~2-9 kills (navigation). Combat is the common bottleneck
+after E1M2.
+
 ## E1M3 (started 00:20, 30 Oct)
 
 One blue key, 42 triggers, 15 lifts, 15 damaging sectors (no radiation
