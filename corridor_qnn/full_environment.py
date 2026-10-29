@@ -127,7 +127,11 @@ class FullDoom:
         self.visited.add(cell)
         self.positions.append(xy.copy())
         if self.navigation=='legacy': target,interaction=self.navigator.update(xy)
-        else: target,interaction=self.navigator.update(xy,v['ANGLE'],self.last_action,bool(self.previous[15]))
+        else:
+            heights=[[round(s.floor_height),round(s.ceiling_height)] for s in state.sectors] if state.sectors else None
+            # Only nearby enemies explain a stall; distant ones must not mask collisions.
+            near_enemy=bool(self.previous[15]>.5 and self.previous[14]<1)
+            target,interaction=self.navigator.update(xy,v['ANGLE'],self.last_action,near_enemy,heights,v['HEALTH'])
         wb,wd=bearing_to(*xy,v['ANGLE'],*target)
         labels=[l for l in state.labels if is_monster(l) and l.width*l.height>=6]
         # Visible engine labels only; objects behind walls never become combat targets.

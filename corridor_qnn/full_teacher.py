@@ -29,8 +29,10 @@ def legacy_teacher_action(features):
 def teacher_action(features):
     """Keep the original combat rules; pulse use while following a clear route."""
     f=np.asarray(features)
-    # Distant or ammo-less fights only drain ammo and health; keep following the route.
-    fight=f[15]>.5 and f[1]>0 and f[14]<1
+    # Distant (>500 units) or ammo-less fights only drain ammo and health; keep following the route.
+    fight=f[15]>.5 and f[1]>0 and f[14]<.625
+    # Back off while firing at an aimed enemy in melee range (demons close in fast).
+    if fight and f[14]*800<128 and abs(math.atan2(f[13],f[12]))<=.12: return 20
     if fight or (f[31]>.5 and f[3]*9<3):
         return legacy_teacher_action(f)
     wb=math.atan2(f[9],f[8])

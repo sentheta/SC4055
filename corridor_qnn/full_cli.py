@@ -166,8 +166,8 @@ def doctor(args):
 def train(args):
     from types import SimpleNamespace
     import copy
-    if args.decisions<1 or args.decisions>10000 or args.epochs<1 or args.batch_size<1:
-        raise ValueError('decisions must be 1..10000, epochs and batch size positive')
+    if args.decisions<1 or args.decisions>100000 or args.epochs<1 or args.batch_size<1:
+        raise ValueError('decisions must be 1..100000, epochs and batch size positive')
     if not 0<=args.teacher_prob<=1: raise ValueError('teacher-prob must be 0..1')
     if args.validation_episodes<1: raise ValueError('validation-episodes must be positive')
     seed_everything(args.seed); torch.set_num_threads(2)

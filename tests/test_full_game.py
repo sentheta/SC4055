@@ -122,8 +122,11 @@ def test_use_release_and_combat_preserved():
     f[len(BASE_FEATURES)+13]=1
     assert teacher_action(f)==0
     for enemy_bearing in (-.4,0,.4):
-        f[15]=1; f[1]=1; f[12]=1; f[13]=enemy_bearing
+        f[15]=1; f[1]=1; f[12]=1; f[13]=enemy_bearing; f[14]=.3
         assert teacher_action(f)==legacy_teacher_action(f)
+    # An aimed enemy in melee range: back off while firing.
+    f[13]=0; f[14]=.1
+    assert teacher_action(f)==20
 
 
 @pytest.mark.parametrize('width,spanned',[(16,True),(64,False)])
