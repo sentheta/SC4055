@@ -166,6 +166,7 @@ class Navigator(LegacyNavigator):
     teleport_specials = {39, 97}
     lift_specials = {10, 21, 62, 88, 120, 121, 122, 123}
     health_things = {2011: 10, 2012: 25, 2013: 100}  # stimpack, medikit, soulsphere
+    damaging_specials = {4, 5, 7, 11, 16}  # nukage, slime, and strobe/damage floors
     # Solid decorations (barrels, lamps, columns, trees, impaled bodies) block movement.
     solid_things = {2035, 2028, 70, 85, 86, 48, 30, 31, 32, 33, 35, 36, 37, 41, 42, 43, 44,
                     45, 46, 47, 54, 55, 56, 57, 25, 26, 27, 28, 29, 49, 50, 51, 52, 53,
@@ -259,6 +260,25 @@ class Navigator(LegacyNavigator):
             # Stand inside the ring of a lift's walk triggers, so stepping off does not lower it under us.
             ring=[t['mid'] for t in self.triggers if t['kind']=='walk' and sid in t['targets']]
             self.lift_centers[sid]=np.mean(ring,0) if len(ring)>=3 else (lo+hi)/2
+        # Cells inside damaging sectors (even-odd test against each sector's edges).
+        self.hazard=np.zeros_like(self.blocked)
+        edges={}
+        for v1,v2,flags,special,tag,right,left in lines:
+            for side in (right,left):
+                if side!=65535: edges.setdefault(sides[side][-1],[]).append((xy[v1],xy[v2]))
+        for sid,sec in enumerate(sectors):
+            if sec[5] not in self.damaging_specials or sid not in edges: continue
+            seg=np.array(edges[sid]); lo=seg.reshape(-1,2).min(0); hi=seg.reshape(-1,2).max(0)
+            (x0,y0),(x1,y1)=self.grid(lo),self.grid(hi)
+            xx,yy=np.meshgrid(np.arange(max(x0,0),min(x1,self.blocked.shape[1]-1)+1),
+                              np.arange(max(y0,0),min(y1,self.blocked.shape[0]-1)+1))
+            px=xx*self.cell+self.origin[0]; py=yy*self.cell+self.origin[1]; inside=np.zeros(xx.shape,bool)
+            for (ax,ay),(bx,by) in seg:
+                if ay==by: continue
+                crosses=((ay>py)!=(by>py))&(px<ax+(py-ay)*(bx-ax)/(by-ay))
+                inside^=crosses
+            self.hazard[yy[inside],xx[inside]]=True
+        self.avoid_hazard=False
         # Cell pairs across moving-sector lines; which way is a drop depends on live heights.
         self.dynamic_pairs=[]
         for p,q,normal in self.dynamic_geometry:
@@ -334,6 +354,7 @@ class Navigator(LegacyNavigator):
 
     def free(self,node):
         return (super().free(node) and not self.lock_mask[node[1],node[0]]
+                and not (self.avoid_hazard and self.hazard[node[1],node[0]])
                 and (self.dropping or not self.dyn_blocked[node[1],node[0]])
                 and self.temporary.get(node,0)<=self.calls)
 
@@ -373,6 +394,20 @@ class Navigator(LegacyNavigator):
         return gain
 
     def route(self,start):
+        """Plan around damaging floors; cross them only when nothing useful is reachable otherwise."""
+        inside=0<=start[1]<self.hazard.shape[0] and 0<=start[0]<self.hazard.shape[1] and self.hazard[start[1],start[0]]
+        if not self.hazard.any() or inside:
+            self.avoid_hazard=False; return self._route(start)
+        self.avoid_hazard=True; path=self._route(start)
+        if self.mode in ('explore','drop','advance','health'):
+            # Hazard cells are always unexplored ground; cross only for a real objective.
+            saved=self.advance_goal
+            self.avoid_hazard=False; crossing=self._route(start)
+            if self.mode in ('exit','key','trigger'): return crossing
+            self.advance_goal=saved; self.avoid_hazard=True; path=self._route(start)
+        return path
+
+    def _route(self,start):
         if not self.free(start):
             candidates=[(start[0]+x,start[1]+y) for x in range(-3,4) for y in range(-3,4)]
             good=[n for n in candidates if self.free(n)]
