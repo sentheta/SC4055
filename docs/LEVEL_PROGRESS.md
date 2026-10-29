@@ -166,12 +166,55 @@ suit). The first exit is only reachable across nukage.
 | Avoid damaging floors (blocked) | survives 600-2300 steps, still 0/6 |
 | Weighted crossing (cost 10), no drops into damaging pits, never a destination | 0/8; ~95% of damage is taken on nukage in the large north room |
 
-Open: the route through the north nukage room needs a short, high-health
-crossing; the teacher currently lingers there (trigger/explore goals).
+Further E1M3 work, gated behind the opt-in `--navigation improved2` so that
+the E1M2 checkpoint keeps the exact waypoints it was trained on (un-gated,
+these changes dropped `e1m2_v3` from 19/20 to 15/20):
 
-### Open issues (22:36, 29 Oct)
+| Change (improved2) | Finding |
+|---|---|
+| Damage split per death | 90-130 of ~130 damage taken on nukage, mostly in trigger/explore modes |
+| Squared-up switch presses (aim through the wall within 72 units) | presses on the pit-lift switches now register |
+| Step off nukage when idle; explore without crossing it | idle damage reduced |
+| Plan from the nearest free cell when the clearance raster blocks the player's own cell | removed a "no path, stand in nukage" state in a narrow channel |
+| Retry escape triggers when trapped on nukage; switches for the same lift share a cooldown | the second switch no longer sends the lift back up |
+| Board a lowered lift right after pressing its switch | 2/8 escape the pit and reach the east area |
 
-- 3/20 student seeds stall after the blue key with ~20 kills (planner loop).
-- 5/20 have the red key but run out of time (health/trigger detours).
-- Teacher dies in 4/16 (ambushes).
-- Evaluating at a longer step limit changes behaviour (time feature).
+E1M3 status at 03:20: teacher 0/8 completions. The pit (a lift inside a
+nukage pool) is now escapable; the survivors then explore the east area for
+thousands of steps without finding the mechanism that opens the way to the
+exit. No student was trained for E1M3, since the method needs a teacher
+that completes the level.
+
+## Summary (03:20, 30 Oct)
+
+| Map | Teacher | QNN student | Torch vs PennyLane | Artifacts |
+|---|---|---|---|---|
+| E1M1 | 20/20 | 49/50 (`e1m1_v4`) | 50/50 episodes identical | `results/levels/E1M1/e1m1_v4/` |
+| E1M2 | 60/64 (94%) | **66/70 (94%)** (`e1m2_v3`) | 20/20 episodes identical | `results/levels/E1M2/e1m2_v3/` |
+| E1M3 | 0/8 | not trained | - | - |
+| E1M4-E1M9 | 0/4 each (survey) | not trained | - | - |
+
+What moved E1M2 from 3/10 to 94%, in order of impact:
+
+1. Teacher turn oscillation fix (waypoint dead zone wider than half a turn).
+2. Heal-to-90 before pushing on (fixed ambushes).
+3. Trigger verification: a press counts only when a target sector moves.
+4. Automatic shotgun selection (removes a rare action label).
+5. 100k teacher decisions instead of 50k.
+
+What did not help: hand-tuned combat variants (strafe-fire, retreat when
+hurt, shell conservation, ammo seeking, always-run), and DAgger round 1 on
+a teacher that still oscillated.
+
+Main lessons:
+
+- Most "student failures" were planner or teacher bugs. The student follows
+  the planner's waypoints, so planner fixes can raise a trained student's
+  completion without retraining, and planner changes can also silently
+  break a trained student; new planner behaviour must be opt-in.
+- 3-5 validation episodes cannot select checkpoints on long levels; saved
+  checkpoints were evaluated on 20-70 seeds.
+- Evaluation must use the training step limit: the time feature is
+  `steps / max_steps`.
+- The bottleneck beyond E1M2 is combat on combat-heavy maps and map-specific
+  mechanisms (E1M3's nukage pit and east area).
