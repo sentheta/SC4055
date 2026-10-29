@@ -327,6 +327,7 @@ class Navigator(LegacyNavigator):
         self.last_xy=None
         for t in self.triggers: t['until']=0; t['pending']=None
         self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.used_targets=set()
+        self.board=None  # (lift sector, deadline) after pressing a nearby lift switch
         self.known_reach=set(); self.taken=set(); self.health=100; self.advance_goal=None
         self.gain_cache={}; self.health_since=0
 
@@ -559,8 +560,15 @@ class Navigator(LegacyNavigator):
             self.boarded.setdefault(sid,'below' if lowered else 'top')
             if not lowered: self.boarded[sid]='top'
             elif self.boarded[sid]=='below':
-                self.mode='ride'; self.path=[]
+                self.mode='ride'; self.path=[]; self.board=None
                 return self.lift_centers[sid],1e6
+        if self.board is not None:
+            sid,deadline=self.board
+            if self.calls<deadline and self.heights[sid][0]<self.static_heights[sid][0]:
+                # The lift is down for only a few seconds: walk straight onto it.
+                self.mode='board'; self.path=[]
+                return self.lift_centers[sid],1e6
+            if self.calls>=deadline: self.board=None
         for t in self.triggers:
             if t['pending'] is not None:
                 # A press only counts once a target sector actually moves; otherwise retry later.
@@ -585,6 +593,9 @@ class Navigator(LegacyNavigator):
                 if t['kind']!='teleport':
                     t['pending']=(self.calls+60,[tuple(self.heights[i]) for i in sorted(t['targets'])])
                 if self.version=='improved2':
+                    near_lift=[sid for sid in t['targets'] if sid in self.lift_centers
+                               and np.linalg.norm(self.lift_centers[sid]-xy)<160]
+                    if near_lift: self.board=(near_lift[0],self.calls+40)
                     # Another switch for the same lift would just send it back: share the cooldown.
                     for other in self.triggers:
                         if other is not t and other['targets']==t['targets'] and not other['once']:
