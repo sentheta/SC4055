@@ -351,7 +351,7 @@ class Navigator(LegacyNavigator):
         self.dyn_blocked=np.zeros_like(self.blocked); self.dropping=False; self._update_dynamic()
         self.last_xy=None
         for t in self.triggers: t['until']=0; t['pending']=None
-        self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.ride_since={}; self.used_targets=set()
+        self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.ride_since={}; self.lift_run=None; self.used_targets=set()
         self.board=None  # (lift sector, deadline) after pressing a nearby lift switch
         self.known_reach=set(); self.taken=set(); self.health=100; self.advance_goal=None
         self.gain_cache={}; self.required_cache={}; self.health_since=0
@@ -565,6 +565,16 @@ class Navigator(LegacyNavigator):
             return path[::-1]
         self.reachable=len(parent); self.replans+=1
         nodes=list(parent); points=np.array(nodes)*self.cell+self.origin
+        if self.lift_run is not None:
+            sid,deadline=self.lift_run
+            if self.calls>=deadline: self.lift_run=None
+            else:
+                # Run straight to the lift just called; it only stays down a few seconds.
+                centre=self.lift_centers[sid]; i=int(np.argmin(np.linalg.norm(points-centre,axis=1)))
+                path=[]; node=nodes[i]; self.goal=None; self.mode='advance'
+                while node!=start:
+                    path.append(node); node=parent[node]
+                return path[::-1]
         choices=[]; mode='exit'
         for approach,mid,normal in self.exit_approaches:
             distance=np.linalg.norm(points-approach,axis=1)
@@ -699,6 +709,8 @@ class Navigator(LegacyNavigator):
                 if self.version=='improved2': return self.lift_centers[sid],HOLD_INTERACTION  # keep boarding armed in case of overshoot
                 self.board=None
                 return self.lift_centers[sid],1e6
+        if self.lift_run is not None and np.linalg.norm(self.lift_centers[self.lift_run[0]]-xy)<300:
+            self.board=(self.lift_run[0],self.calls+30); self.lift_run=None
         if self.board is not None:
             sid,deadline=self.board
             if self.calls<deadline and self.heights[sid][0]<self.static_heights[sid][0]:
@@ -753,6 +765,10 @@ class Navigator(LegacyNavigator):
                                       and np.linalg.norm(self.lift_centers[sid]-xy)<300),
                                      key=lambda sid:np.linalg.norm(self.lift_centers[sid]-xy))
                     if near_lift: self.board=(near_lift[0],self.calls+40)
+                    else:
+                        # A distant lift (up to ~600 units) still gives time for a direct run.
+                        far=[sid for sid in t['targets'] if sid in self.lift_centers and np.linalg.norm(self.lift_centers[sid]-xy)<600]
+                        if far: self.lift_run=(far[0],self.calls+40); self.path=[]
                     # Another switch for the same lift would just send it back: share the cooldown.
                     for other in self.triggers:
                         if other is not t and other['targets']==t['targets'] and not other['once']:
