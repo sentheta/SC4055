@@ -55,8 +55,9 @@ class VariationalQuantumCircuit(nn.Module):
     per qubit. This is an ideal noise-free state-vector simulation.
     """
 
-    def __init__(self, qubits: int = 4, layers: int = 2, reupload: bool = False):
+    def __init__(self, qubits: int = 4, layers: int = 2, reupload: bool = False, zz: bool = False):
         super().__init__()
+        self.zz = zz
         if not 2 <= qubits <= 8:
             raise ValueError("Supported range: 2 to 8 qubits")
         if layers < 1:
@@ -102,6 +103,11 @@ class VariationalQuantumCircuit(nn.Module):
             for control in range(self.qubits):
                 state = state[:, getattr(self, f"cnot_{control}")]
         probabilities = state.abs().square()
+        if self.zz:
+            # Pair correlators expose entanglement directly to the action head.
+            signs = [getattr(self, f"z_signs_{i}") for i in range(self.qubits)]
+            signs += [signs[i] * signs[j] for i in range(self.qubits) for j in range(i + 1, self.qubits)]
+            return torch.stack([probabilities @ s for s in signs], dim=-1)
         return torch.stack(
             [probabilities @ getattr(self, f"z_signs_{i}")
              for i in range(self.qubits)], dim=-1

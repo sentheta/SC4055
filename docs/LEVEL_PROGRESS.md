@@ -175,6 +175,20 @@ On seeds 800-869 `e1m2_d2` scores 61/70 (v3: 66/70), so overall **152/170
 PennyLane re-runs (seeds 800-819) agree exactly (17/20 each, 20/20 episodes
 identical). `e1m2_v3` remains the exported E1M2 model.
 
+### Does the circuit matter? (23:45, 30 Oct)
+
+Ablation of `e1m2_v3` with the quantum gain set to zero, seeds 800-869:
+**64/70, against 66/70 with the circuit on.** No measurable contribution:
+the classical residual path makes essentially all decisions. The 90% is a
+result for the hybrid system, not evidence that the circuit helps.
+
+Literature consulted: trainable-encoding re-uploading (arXiv 2606.25598),
+component evaluation of quantum RL (2511.17112), classical surrogates of
+quantum policies (2609.16266). New opt-in options: `--reupload`, `--zz`
+(all ZZ correlators), `--no-residual` (policy from measurements only).
+All compared on v3's 100k decisions, same initialisation; results below as
+they arrive.
+
 ## E1M3 (started 00:20, 30 Oct)
 
 One blue key, 42 triggers, 15 lifts, 15 damaging sectors (no radiation

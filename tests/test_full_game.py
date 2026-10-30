@@ -301,3 +301,17 @@ def test_reupload_checkpoint_round_trip(tmp_path):
     angles = torch.rand(3, 4)
     assert torch.equal(model.core(angles), loaded.core(angles))
     assert 'core.input_scale' not in FullActorCritic('quantum', 4, 2).state_dict()
+
+
+def test_no_residual_zz_checkpoint_round_trip(tmp_path):
+    from corridor_qnn.full_models import FullActorCritic, save_full, load_full
+    import torch
+    model = FullActorCritic('quantum', 4, 2, True, False, True).eval()
+    x = torch.zeros(2, 64, 96); f = torch.zeros(2, FEATURE_DIM)
+    logits, _ = model(x, f)
+    assert model.actor.in_features == 10 and logits.shape == (2, 21)
+    path = tmp_path/'m.pt'; save_full(path, model, {})
+    assert torch.equal(load_full(path)(x, f)[0], logits)
+    # The bypass really is gone: its weights do not affect the policy.
+    with torch.no_grad(): model.classical_actor.weight.add_(1.)
+    assert torch.equal(model(x, f)[0], logits)

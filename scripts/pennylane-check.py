@@ -15,7 +15,7 @@ from corridor_qnn.full_models import load_full
 class PennyLaneCircuit(nn.Module):
     """Same circuit as corridor_qnn.quantum.VariationalQuantumCircuit, as a PennyLane QNode."""
 
-    def __init__(self, weights, input_scale=None):
+    def __init__(self, weights, input_scale=None, zz=False):
         super().__init__()
         self.input_scale = None if input_scale is None else input_scale.detach().clone().double()
         self.weights = nn.Parameter(weights.detach().clone().double())
@@ -35,17 +35,19 @@ class PennyLaneCircuit(nn.Module):
                     qml.RZ(weights[layer, wire, 1], wires=wire)
                 for control in range(self.qubits):
                     qml.CNOT(wires=[control, (control + 1) % self.qubits])
-            return [qml.expval(qml.PauliZ(w)) for w in range(self.qubits)]
+            singles = [qml.expval(qml.PauliZ(w)) for w in range(self.qubits)]
+            pairs = [qml.expval(qml.PauliZ(i) @ qml.PauliZ(j)) for i in range(self.qubits) for j in range(i + 1, self.qubits)]
+            return singles + pairs if zz else singles
 
         self.circuit = circuit
 
     def forward(self, angles):
         out = self.circuit(angles.double(), self.weights)
-        return torch.stack(out, -1).reshape(angles.shape[0], self.qubits).float()
+        return torch.stack(out, -1).reshape(angles.shape[0], -1).float()
 
 
 def to_pennylane(model):
-    model.core = PennyLaneCircuit(model.core.weights, getattr(model.core, 'input_scale', None))
+    model.core = PennyLaneCircuit(model.core.weights, getattr(model.core, 'input_scale', None), getattr(model, 'zz', False))
     return model
 
 

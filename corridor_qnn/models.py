@@ -50,7 +50,9 @@ class ActorCritic(nn.Module):
         fused = self.fusion(torch.cat([encoded, features.float()], dim=-1))
         a = self.angles(fused)
         measured = self.core(a*math.pi) if self.kind == "quantum" else self.core(a)
-        logits = self.classical_actor(fused) + self.quantum_gain * self.actor(measured)
+        logits = self.quantum_gain * self.actor(measured)
+        if getattr(self, 'residual', True):
+            logits = self.classical_actor(fused) + logits
         value = self.critic(torch.cat([fused, measured], dim=-1)).squeeze(-1)
         return logits, value
 
