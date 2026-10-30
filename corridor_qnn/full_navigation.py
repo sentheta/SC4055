@@ -592,6 +592,8 @@ class Navigator(LegacyNavigator):
                     limit=60 if self.health>=70 else np.inf
                     # A key still to fetch outranks a long detour unless death is close.
                     if self.version=='improved2' and self.health>=30 and any(c not in self.held for c,_ in self.keys): limit=60
+                    # Standing in damage: getting out comes first, unless the item is nearly underfoot.
+                    if self.version=='improved2' and self.hazard[start[1],start[0]]: limit=min(limit,60)
                     if dist[nodes[i]]<limit: choices.append((dist[nodes[i]],nodes[i],pos,k))
             mode='health'
         if not choices:
