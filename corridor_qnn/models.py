@@ -24,7 +24,7 @@ class VisionEncoder(nn.Module):
 
 
 class ActorCritic(nn.Module):
-    def __init__(self, kind="quantum", qubits=6, layers=2):
+    def __init__(self, kind="quantum", qubits=6, layers=2, reupload=False):
         super().__init__()
         if kind not in ("quantum", "classical"):
             raise ValueError("kind must be quantum or classical")
@@ -34,7 +34,7 @@ class ActorCritic(nn.Module):
                                     nn.Linear(64, 48), nn.Tanh())
         self.angles = nn.Sequential(nn.Linear(48, qubits), nn.Tanh())
         if kind == "quantum":
-            self.core = VariationalQuantumCircuit(qubits, layers)
+            self.core = VariationalQuantumCircuit(qubits, layers, reupload)
         else:
             self.core = nn.Sequential(nn.Linear(qubits, 32), nn.Tanh(),
                                       nn.Linear(32, qubits), nn.Tanh())

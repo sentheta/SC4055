@@ -55,7 +55,7 @@ class VariationalQuantumCircuit(nn.Module):
     per qubit. This is an ideal noise-free state-vector simulation.
     """
 
-    def __init__(self, qubits: int = 4, layers: int = 2):
+    def __init__(self, qubits: int = 4, layers: int = 2, reupload: bool = False):
         super().__init__()
         if not 2 <= qubits <= 8:
             raise ValueError("Supported range: 2 to 8 qubits")
@@ -63,7 +63,11 @@ class VariationalQuantumCircuit(nn.Module):
             raise ValueError("At least one layer is needed")
         self.qubits = qubits
         self.layers = layers
+        self.reupload = reupload
         self.weights = nn.Parameter(0.15 * torch.randn(layers, qubits, 2))
+        if reupload:
+            # Data re-uploading: inputs are encoded before every layer, with trainable scales.
+            self.input_scale = nn.Parameter(torch.ones(layers, qubits))
         for control in range(qubits):
             self.register_buffer(
                 f"cnot_{control}",
@@ -83,10 +87,13 @@ class VariationalQuantumCircuit(nn.Module):
                             dtype=torch.complex64, device=angles.device)
         state[:, 0] = 1.0 + 0.0j  # |000...0>
 
-        for wire in range(self.qubits):
-            state = apply_single_qubit(state, ry(angles[:, wire]), wire, self.qubits)
+        if not self.reupload:
+            for wire in range(self.qubits):
+                state = apply_single_qubit(state, ry(angles[:, wire]), wire, self.qubits)
         for layer in range(self.layers):
             for wire in range(self.qubits):
+                if self.reupload:
+                    state = apply_single_qubit(state, ry(self.input_scale[layer, wire] * angles[:, wire]), wire, self.qubits)
                 y = self.weights[layer, wire, 0].expand(batch)
                 z = self.weights[layer, wire, 1].expand(batch)
                 state = apply_single_qubit(state, ry(y), wire, self.qubits)

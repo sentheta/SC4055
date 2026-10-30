@@ -44,6 +44,9 @@ def add_commands(sp):
             p.add_argument('--end-map',default='MAP30')
         if command=='full-train':
             p.add_argument('--model',choices=('quantum','classical'),default='quantum')
+            p.add_argument('--qubits',type=int,default=6)
+            p.add_argument('--layers',type=int,default=2)
+            p.add_argument('--reupload',action='store_true',help='Data re-uploading with trainable input scales')
             p.add_argument('--decisions',type=int,default=6000)
             p.add_argument('--epochs',type=int,default=12)
             p.add_argument('--batch-size',type=int,default=64)
@@ -179,7 +182,7 @@ def train(args):
     if Path(checkpoint).exists(): raise FileExistsError(f'Preserve existing checkpoint: {checkpoint}; use --output-checkpoint')
     if args.checkpoint and Path(checkpoint).resolve()==args.checkpoint.resolve():
         raise ValueError('Use a separate output checkpoint to preserve the input candidate')
-    model=load_full(args.checkpoint,args.model) if args.checkpoint else FullActorCritic(args.model)
+    model=load_full(args.checkpoint,args.model) if args.checkpoint else FullActorCritic(args.model,args.qubits,args.layers,args.reupload)
     transferred=transfer_corridor(model,args.transfer_corridor) if args.transfer_corridor else []
     started=time.perf_counter(); rng=np.random.default_rng(args.seed)
     dataset_path=args.output_dir/f'demonstrations_{args.seed}.npz'

@@ -15,18 +15,22 @@ from corridor_qnn.full_models import load_full
 class PennyLaneCircuit(nn.Module):
     """Same circuit as corridor_qnn.quantum.VariationalQuantumCircuit, as a PennyLane QNode."""
 
-    def __init__(self, weights):
+    def __init__(self, weights, input_scale=None):
         super().__init__()
+        self.input_scale = None if input_scale is None else input_scale.detach().clone().double()
         self.weights = nn.Parameter(weights.detach().clone().double())
         self.qubits = weights.shape[1]
         device = qml.device('default.qubit', wires=self.qubits)
 
         @qml.qnode(device, interface='torch', diff_method='backprop')
         def circuit(angles, weights):
-            for wire in range(self.qubits):
-                qml.RY(angles[..., wire], wires=wire)
+            if self.input_scale is None:
+                for wire in range(self.qubits):
+                    qml.RY(angles[..., wire], wires=wire)
             for layer in range(weights.shape[0]):
                 for wire in range(self.qubits):
+                    if self.input_scale is not None:
+                        qml.RY(self.input_scale[layer, wire] * angles[..., wire], wires=wire)
                     qml.RY(weights[layer, wire, 0], wires=wire)
                     qml.RZ(weights[layer, wire, 1], wires=wire)
                 for control in range(self.qubits):
@@ -41,7 +45,7 @@ class PennyLaneCircuit(nn.Module):
 
 
 def to_pennylane(model):
-    model.core = PennyLaneCircuit(model.core.weights)
+    model.core = PennyLaneCircuit(model.core.weights, getattr(model.core, 'input_scale', None))
     return model
 
 

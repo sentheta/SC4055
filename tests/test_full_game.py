@@ -288,3 +288,16 @@ def test_nonadvancing_engine_cannot_produce_benchmark_metrics():
     env.game.get_episode_time=lambda:140
     with pytest.raises(RuntimeError,match='failed to advance'):
         env.step(0)
+
+
+def test_reupload_checkpoint_round_trip(tmp_path):
+    from corridor_qnn.full_models import FullActorCritic, save_full, load_full
+    import torch
+    model = FullActorCritic('quantum', 4, 2, True)
+    assert 'core.input_scale' in model.state_dict()
+    path = tmp_path/'m.pt'; save_full(path, model, {})
+    loaded = load_full(path)
+    assert loaded.reupload
+    angles = torch.rand(3, 4)
+    assert torch.equal(model.core(angles), loaded.core(angles))
+    assert 'core.input_scale' not in FullActorCritic('quantum', 4, 2).state_dict()
