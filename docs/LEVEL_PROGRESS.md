@@ -355,3 +355,11 @@ E1M4 improved2 teacher (seeds 800-807): completed 0 / 8 | deaths 8
 ```
 
 The gain-0 line is `e1m3_v1` on seeds 800-839, to compare with 18/40 with the circuit on. These checks replace the "not checked" note above for the maps listed. E1M4 dies with 15-53 kills, half of the seeds holding the yellow key; no planner work has been done on it.
+
+The E1M3 gain-0 result was cross-checked with `full-eval --quantum-disabled` on
+seeds 801, 805, 807, 811 and 815. All five complete with the circuit on and none
+completes with it off, so the two ablation routes agree. This model depends on its
+circuit, unlike `e1m2_v3` (64/70 against 66/70), with a similar learned gain (2.25
+against 2.23). It does not show a quantum advantage: removing a trained component
+says nothing about what a classical model trained on the same data would reach.
+That comparison has not been run on E1M3 and is the next experiment to do.
