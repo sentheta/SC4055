@@ -177,6 +177,7 @@ class Navigator(LegacyNavigator):
     solid_things = {2035, 2028, 70, 85, 86, 48, 30, 31, 32, 33, 35, 36, 37, 41, 42, 43, 44,
                     45, 46, 47, 54, 55, 56, 57, 25, 26, 27, 28, 29, 49, 50, 51, 52, 53,
                     73, 74, 75, 76, 77, 78}
+    stair_specials = {7, 8, 100, 127}
     # Gun-activated and monster-only lines cannot be used by walking or USE.
     unusable_specials = {24, 46, 47, 125, 126}
     once_specials = {2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -199,6 +200,8 @@ class Navigator(LegacyNavigator):
         self.static_heights=[list(sec[:2]) for sec in sectors]
         targeted={tag for _,_,_,special,tag,_,_ in lines if special and tag}
         self.dynamic_sectors={i for i,sec in enumerate(sectors) if sec[6] in targeted}
+        self.stair_chains={}
+        if version=='improved2': self._find_stairs(lines,sides,sectors)
         lift_tags={tag for _,_,_,special,tag,_,_ in lines if special in self.lift_specials and tag}
         self.lift_sectors=[i for i,sec in enumerate(sectors) if sec[6] in lift_tags]
         things=read_things(path,name)
@@ -239,6 +242,9 @@ class Navigator(LegacyNavigator):
                 self.triggers.append(dict(kind=kind,p=p,q=q,mid=midpoint,normal=normal,
                                           once=special in self.once_specials,
                                           targets={i for i,sec in enumerate(sectors) if sec[6]==tag}))
+                if special in self.stair_specials:
+                    for sid in list(self.triggers[-1]['targets']):
+                        self.triggers[-1]['targets']|=self.stair_chains.get(sid,set())
             if special in self.locks:
                 grid=self.locked.setdefault(self.locks[special],np.zeros_like(self.blocked))
                 self._raster_segment(p,q,self.radius,grid)
@@ -413,6 +419,25 @@ class Navigator(LegacyNavigator):
                 if node not in parent and self.free(node):
                     parent[node]=(x,y); dist[node]=dist[(x,y)]+1; queue.append(node)
         return parent,dist
+
+    def _find_stairs(self,lines,sides,sectors):
+        """Stair builders also raise untagged sectors: follow Doom's rule (EV_BuildStairs), stepping
+        across two-sided lines whose front is the current sector, while the floor texture matches."""
+        for _,_,_,special,tag,_,_ in lines:
+            if special not in self.stair_specials or not tag: continue
+            for sid,sec in enumerate(sectors):
+                if sec[6]!=tag: continue
+                chain={sid}; current=sid; found=True
+                while found:
+                    found=False
+                    for _,_,_,_,_,right,left in lines:
+                        if left==65535 or sides[right][-1]!=current: continue
+                        other=sides[left][-1]
+                        if sectors[other][2]!=sec[2] or other in chain: continue
+                        chain.add(other); current=other; found=True
+                        break
+                self.stair_chains[sid]=chain
+                self.dynamic_sectors|=chain
 
     def _carve_gaps(self,xy,lines,sides,sectors):
         """Wall inflation can seal a gap the 32-wide player fits through: keep a channel across
@@ -682,6 +707,10 @@ class Navigator(LegacyNavigator):
                 return self.lift_centers[sid],HOLD_INTERACTION if self.version=='improved2' else 1e6
             if self.calls>=deadline: self.board=None
         for t in self.triggers:
+            if self.version=='improved2' and t['once'] and t['until']!=np.inf and any(self.heights[i]!=self.static_heights[i] for i in t['targets']):
+                # A one-shot trigger whose sector has moved is spent, whether or not the press was seen.
+                t['until']=np.inf; t['pending']=None; self.used_targets|=t['targets']
+                if id(t)==self.trigger_goal: self.trigger_goal=None; self.path=[]
             if t['pending'] is not None:
                 # A press only counts once a target sector actually moves; otherwise retry later.
                 deadline,base=t['pending']
