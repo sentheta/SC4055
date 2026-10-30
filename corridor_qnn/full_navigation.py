@@ -265,6 +265,7 @@ class Navigator(LegacyNavigator):
             # Skip multiplayer-only things (flag 16); skill filtering is not applied.
             if t in self.solid_things and not flags&16:
                 c=np.array([x,y],dtype=float); self._raster_segment(c,c,16+self.radius)
+        if self.version=='improved2': self._carve_gaps(xy,lines,sides,sectors)
         for sid,(lo,hi) in self.lift_boxes.items():
             # Stand inside the ring of a lift's walk triggers, so stepping off does not lower it under us.
             ring=[t['mid'] for t in self.triggers if t['kind']=='walk' and sid in t['targets']]
@@ -412,6 +413,37 @@ class Navigator(LegacyNavigator):
                 if node not in parent and self.free(node):
                     parent[node]=(x,y); dist[node]=dist[(x,y)]+1; queue.append(node)
         return parent,dist
+
+    def _carve_gaps(self,xy,lines,sides,sectors):
+        """Wall inflation can seal a gap the 32-wide player fits through: keep a channel across
+        short walkable lines, provided it crosses no obstacle and joins cells already free."""
+        def walkable(line):
+            _,_,flags,_,_,right,left=line
+            if left==65535 or flags&1: return False
+            i,j=sides[right][-1],sides[left][-1]
+            if {i,j}&self.dynamic_sectors: return False
+            return abs(sectors[i][0]-sectors[j][0])<=24 and min(sectors[i][1],sectors[j][1])-max(sectors[i][0],sectors[j][0])>=56
+        obstacles=np.array([[*xy[l[0]],*xy[l[1]]] for l in lines if not walkable(l)],dtype=float)
+        def blocked_by_obstacle(a,b):
+            p=obstacles[:,:2]; r=obstacles[:,2:]-p; d=b-a
+            denom=r[:,0]*d[1]-r[:,1]*d[0]
+            with np.errstate(divide='ignore',invalid='ignore'):
+                t=((a[0]-p[:,0])*d[1]-(a[1]-p[:,1])*d[0])/denom
+                u=((a[0]-p[:,0])*r[:,1]-(a[1]-p[:,1])*r[:,0])/denom
+            return bool(((denom!=0)&(t>=0)&(t<=1)&(u>=0)&(u<=1)).any())
+        inside=lambda c:0<=c[1]<self.blocked.shape[0] and 0<=c[0]<self.blocked.shape[1]
+        carved=[]
+        for line in lines:
+            if not walkable(line): continue
+            v1,v2=xy[line[0]].astype(float),xy[line[1]].astype(float); length=np.linalg.norm(v2-v1)
+            if not 34<=length<=64: continue
+            mid=(v1+v2)/2; normal=np.array([v2[1]-v1[1],v1[0]-v2[0]])/length
+            ends=[self.grid(mid+normal*sign*32) for sign in (-1,1)]
+            if not all(inside(c) and not self.blocked[c[1],c[0]] for c in ends): continue
+            if blocked_by_obstacle(mid-normal*32,mid+normal*32): continue
+            carved+=[self.grid(mid+normal*d) for d in np.arange(-32,33,8)]
+        for x,y in carved:
+            if inside((x,y)): self.blocked[y,x]=False
 
     def _crosses_hazard(self,a,b):
         """From safe ground, would a straight walk from a to b step onto a damaging floor?"""
@@ -687,8 +719,10 @@ class Navigator(LegacyNavigator):
                     wait=8 if self.version=='improved2' and t['kind']=='switch' else 60
                     t['pending']=(self.calls+wait,[tuple(self.heights[i]) for i in sorted(t['targets'])])
                 if self.version=='improved2':
-                    near_lift=[sid for sid in t['targets'] if sid in self.lift_centers
-                               and np.linalg.norm(self.lift_centers[sid]-xy)<160]
+                    # The lift stays down about 3 seconds, enough to run ~300 units.
+                    near_lift=sorted((sid for sid in t['targets'] if sid in self.lift_centers
+                                      and np.linalg.norm(self.lift_centers[sid]-xy)<300),
+                                     key=lambda sid:np.linalg.norm(self.lift_centers[sid]-xy))
                     if near_lift: self.board=(near_lift[0],self.calls+40)
                     # Another switch for the same lift would just send it back: share the cooldown.
                     for other in self.triggers:
