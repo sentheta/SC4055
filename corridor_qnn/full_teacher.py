@@ -36,7 +36,7 @@ def teacher_action(features):
     if fight or (f[31]>.5 and f[3]*9<3):
         action=legacy_teacher_action(f)
         # Next to a damaging floor: hold position and shoot rather than charge off the ledge.
-        return 6 if action==7 and abs(f[11]-3.25)<1e-3 else action
+        return 6 if action==7 and (abs(f[11]-3.25)<1e-3 or abs(f[11]-3.125)<1e-3) else action
     wb=math.atan2(f[9],f[8])
     last=int(np.argmax(f[len(BASE_FEATURES):])) if f[len(BASE_FEATURES):].sum() else -1
     # Lift ride: momentum carries the player off a small platform, so brake and then stand still.

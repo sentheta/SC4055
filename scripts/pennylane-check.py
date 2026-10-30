@@ -36,8 +36,10 @@ class PennyLaneCircuit(nn.Module):
                 for control in range(self.qubits):
                     qml.CNOT(wires=[control, (control + 1) % self.qubits])
             singles = [qml.expval(qml.PauliZ(w)) for w in range(self.qubits)]
-            pairs = [qml.expval(qml.PauliZ(i) @ qml.PauliZ(j)) for i in range(self.qubits) for j in range(i + 1, self.qubits)]
-            return singles + pairs if zz else singles
+            # Build these only when used: PennyLane queues every measurement it sees.
+            if not zz:
+                return singles
+            return singles + [qml.expval(qml.PauliZ(i) @ qml.PauliZ(j)) for i in range(self.qubits) for j in range(i + 1, self.qubits)]
 
         self.circuit = circuit
 
