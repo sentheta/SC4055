@@ -341,3 +341,17 @@ rules only fire on the `improved2` signals, and no test covers them.
 
 Open: the teacher misses the target even at 16000 steps, and the student loses
 about 15 to 37 points against it. E1M4 onward has not been started.
+
+### Final checks (31 Oct)
+
+Raw output, seeds as run:
+
+```
+E1M1 improved2 teacher completed 8 / 8 | deaths 0
+e1m3_v1 gain0 completed 0 / 40 | deaths 6
+e1m2_v3 (improved navigation, seeds 800-819): completed 19 / 20 | deaths 0
+E1M2 improved2 teacher (seeds 800-807): completed 8 / 8 | deaths 0
+E1M4 improved2 teacher (seeds 800-807): completed 0 / 8 | deaths 8
+```
+
+The gain-0 line is `e1m3_v1` on seeds 800-839, to compare with 18/40 with the circuit on. These checks replace the "not checked" note above for the maps listed. E1M4 dies with 15-53 kills, half of the seeds holding the yellow key; no planner work has been done on it.
