@@ -1,0 +1,185 @@
+{
+  "training": "full-game behavior cloning",
+  "collected_decisions": 0,
+  "samples": 200000,
+  "map": "E1M3",
+  "skill": 1,
+  "seed": 42,
+  "validation_seed": 500,
+  "auto_weapon": true,
+  "max_steps": 8000,
+  "transferred_keys": [
+    "quantum_gain",
+    "vision.net.0.weight",
+    "vision.net.0.bias",
+    "vision.net.2.weight",
+    "vision.net.2.bias",
+    "vision.net.4.weight",
+    "vision.net.4.bias",
+    "vision.net.7.weight",
+    "vision.net.7.bias",
+    "fusion.2.weight",
+    "fusion.2.bias",
+    "angles.0.weight",
+    "angles.0.bias",
+    "core.weights",
+    "critic.0.weight",
+    "critic.0.bias",
+    "critic.2.weight",
+    "critic.2.bias"
+  ],
+  "collection": [],
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.49140238190173974,
+      "episode_heldout_accuracy": 0.9383561643835616
+    },
+    {
+      "epoch": 2,
+      "loss": 0.2472219326030627,
+      "episode_heldout_accuracy": 0.9794520547945206
+    },
+    {
+      "epoch": 3,
+      "loss": 0.19810656700229046,
+      "episode_heldout_accuracy": 0.9726027397260274
+    },
+    {
+      "epoch": 4,
+      "loss": 0.1704881004027693,
+      "episode_heldout_accuracy": 0.9794520547945206
+    },
+    {
+      "epoch": 5,
+      "loss": 0.14785948322324513,
+      "episode_heldout_accuracy": 0.9863013698630136
+    },
+    {
+      "epoch": 6,
+      "loss": 0.13181034305604902,
+      "episode_heldout_accuracy": 0.9863013698630136,
+      "gameplay": {
+        "policy": "quantum",
+        "map": "E1M3",
+        "skill": 1,
+        "seeds": [
+          500,
+          501,
+          502,
+          503,
+          504
+        ],
+        "episodes": 5,
+        "navigation": "improved2",
+        "teacher_version": "improved",
+        "quantum_disabled": false,
+        "auto_weapon": true,
+        "max_steps": 8000,
+        "frame_skip": 4,
+        "iwad": "/mnt/d/uni/sc4055 Intro To Quantum Computing/quantum-playing-doom/.conda/lib/python3.11/site-packages/vizdoom/freedoom1.wad",
+        "iwad_sha256": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d",
+        "completion_rate": 0.4,
+        "death_rate": 0.2,
+        "mean_kills": 28.4,
+        "mean_survival_seconds": 660.2057142857143,
+        "mean_coverage_cells": 365.6,
+        "mean_items": 17.0,
+        "mean_pickup_events": 44.2,
+        "mean_health": 66.2,
+        "mean_raw_reward": 0.4,
+        "mean_shaped_reward": 143.34300000001053,
+        "mean_steps": 5777.0,
+        "mean_max_displacement": 3334.4121011059447,
+        "mean_wall_seconds": 52.0501086176002,
+        "inference_seconds": 48.8036326400088,
+        "total_wall_seconds": 262.7915144409999,
+        "runtime": {
+          "torch": "2.14.1+cpu",
+          "vizdoom": "1.3.2",
+          "torch_threads": 1
+        },
+        "checkpoint": "in_memory_candidate",
+        "checkpoint_sha256": null
+      }
+    },
+    {
+      "epoch": 7,
+      "loss": 0.11704215569704064,
+      "episode_heldout_accuracy": 0.9931506849315068
+    },
+    {
+      "epoch": 8,
+      "loss": 0.10605276650547228,
+      "episode_heldout_accuracy": 0.9794520547945206
+    },
+    {
+      "epoch": 9,
+      "loss": 0.09354506935451021,
+      "episode_heldout_accuracy": 0.9931506849315068
+    },
+    {
+      "epoch": 10,
+      "loss": 0.0844401007009802,
+      "episode_heldout_accuracy": 0.9863013698630136
+    },
+    {
+      "epoch": 11,
+      "loss": 0.07903635244108705,
+      "episode_heldout_accuracy": 1.0
+    },
+    {
+      "epoch": 12,
+      "loss": 0.07388516473217739,
+      "episode_heldout_accuracy": 1.0,
+      "gameplay": {
+        "policy": "quantum",
+        "map": "E1M3",
+        "skill": 1,
+        "seeds": [
+          500,
+          501,
+          502,
+          503,
+          504
+        ],
+        "episodes": 5,
+        "navigation": "improved2",
+        "teacher_version": "improved",
+        "quantum_disabled": false,
+        "auto_weapon": true,
+        "max_steps": 8000,
+        "frame_skip": 4,
+        "iwad": "/mnt/d/uni/sc4055 Intro To Quantum Computing/quantum-playing-doom/.conda/lib/python3.11/site-packages/vizdoom/freedoom1.wad",
+        "iwad_sha256": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d",
+        "completion_rate": 0.4,
+        "death_rate": 0.6,
+        "mean_kills": 24.6,
+        "mean_survival_seconds": 477.12571428571425,
+        "mean_coverage_cells": 306.6,
+        "mean_items": 13.0,
+        "mean_pickup_events": 37.2,
+        "mean_health": 42.0,
+        "mean_raw_reward": 0.4,
+        "mean_shaped_reward": 126.0110000000055,
+        "mean_steps": 4175.0,
+        "mean_max_displacement": 3332.4307528177787,
+        "mean_wall_seconds": 35.976666550799564,
+        "inference_seconds": 35.234081256165155,
+        "total_wall_seconds": 182.37508110099952,
+        "runtime": {
+          "torch": "2.14.1+cpu",
+          "vizdoom": "1.3.2",
+          "torch_threads": 1
+        },
+        "checkpoint": "in_memory_candidate",
+        "checkpoint_sha256": null
+      }
+    }
+  ],
+  "dataset": "outputs/e1m3_v1/demonstrations.npz",
+  "validation_episodes": 5,
+  "selected_epoch": 6,
+  "training_wall_seconds": 1068.8215402810001,
+  "quantum_parameter_l2_change": 1.03093683719635
+}

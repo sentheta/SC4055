@@ -300,3 +300,44 @@ Main lessons:
   `steps / max_steps`.
 - The bottleneck beyond E1M2 is combat on combat-heavy maps and map-specific
   mechanisms (E1M3's nukage pit and east area).
+
+### E1M3 results (04:35, 31 Oct): first QNN, below the 90% target
+
+Further teacher faults fixed after the list above: gaps sealed by wall inflation
+(a channel is now carved across short walkable lines), untagged stair sectors
+(now followed with Doom's stair-building rule), spent one-shot switches, distant
+lifts (a direct run after the press), health detours while standing in nukage,
+and charging enemies while riding a lift. The level finishes through the exit at
+(-2196, 2264), behind the lift called by switch (-1856, 2472). That corrects
+steps 4-5 of the route above: switch (-88, 896) is not needed on this route, and
+sector 146 was not seen to move in the run traced.
+
+| Agent | Step limit | Seeds | Completed |
+| --- | --- | --- | --- |
+| Teacher | 8000 | 800-839 | 24/40 (60%) |
+| Teacher | 16000 | 800-839 | 32/40 (80%) |
+| QNN `e1m3_v1` | 8000 | 800-839 | 18/40 (45%) |
+| QNN `e1m3_v1`, torch | 8000 | 800-819 | 10/20 |
+| QNN `e1m3_v1`, PennyLane | 8000 | 800-819 | 10/20, same outcome and steps per seed |
+| QNN `e1m3_v2` (later teacher, 16000 limit) | 16000 | 800-839 | 17/40 (43%) |
+
+Parity on `e1m3_v1`: 100% action agreement over 2000 game states.
+
+`e1m3_v1` is exported to `results/levels/E1M3/e1m3_v1/`. It was trained before
+the lift-fight teacher rule. The teacher's 75% on seeds 800-815 did not hold up
+on 40 seeds.
+
+Rejected, each measured on seeds 800-815 or 800-807: doubling cooldowns for
+repeatable triggers (1/16) and speed-based braking (3/16, against 9/16 without).
+
+Regressions noticed: `scripts/pennylane-check.py` crashed for every model from the
+`--zz` change until now, because unused ZZ measurements were queued. Fixed; results
+from before that change stand, and `e1m2_v3` parity was rerun and passes. A stray
+`cat > /dev/null` also hung one test for about 90 minutes.
+
+Not checked: the `improved2` changes have not been re-run on E1M1 or E1M2. Models
+on `improved` navigation are unaffected by the planner gates, but the shared teacher
+rules only fire on the `improved2` signals, and no test covers them.
+
+Open: the teacher misses the target even at 16000 steps, and the student loses
+about 15 to 37 points against it. E1M4 onward has not been started.
