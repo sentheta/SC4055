@@ -46,6 +46,12 @@ def read_things(path, name):
     return list(struct.iter_unpack('<hhhhh', found.get('THINGS', b'')))
 
 
+# Interaction distance marking "stop on this waypoint" (lift rides): feature value 400/128 = 3.125.
+HOLD_INTERACTION = 400.0
+# Interaction distance marking "beside a damaging floor": feature value 416/128 = 3.25.
+LEDGE_INTERACTION = 416.0
+
+
 def read_map(path, name):
     found = _map_lumps(path, name)
     def records(key, fmt):
@@ -274,6 +280,7 @@ class Navigator(LegacyNavigator):
         for v1,v2,flags,special,tag,right,left in lines:
             for side in (right,left):
                 if side!=65535: edges.setdefault(sides[side][-1],[]).append((xy[v1],xy[v2]))
+        self.sector_edges=edges
         for sid,sec in enumerate(sectors):
             if sec[5] not in self.damaging_specials or sid not in edges: continue
             seg=np.array(edges[sid]); lo=seg.reshape(-1,2).min(0); hi=seg.reshape(-1,2).max(0)
@@ -287,6 +294,12 @@ class Navigator(LegacyNavigator):
                 inside^=crosses
             self.hazard[yy[inside],xx[inside]]=True
         self.avoid_hazard=False
+        margin=self.hazard.copy()
+        for _ in range(2):
+            grown=margin.copy()
+            grown[1:]|=margin[:-1]; grown[:-1]|=margin[1:]; grown[:,1:]|=margin[:,:-1]; grown[:,:-1]|=margin[:,1:]
+            margin=grown
+        self.hazard_margin=margin&~self.hazard
         # Cell pairs across moving-sector lines; which way is a drop depends on live heights.
         self.dynamic_pairs=[]
         for p,q,normal in self.dynamic_geometry:
@@ -331,10 +344,10 @@ class Navigator(LegacyNavigator):
         self.dyn_blocked=np.zeros_like(self.blocked); self.dropping=False; self._update_dynamic()
         self.last_xy=None
         for t in self.triggers: t['until']=0; t['pending']=None
-        self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.used_targets=set()
+        self.trigger_goal=None; self.trigger_since=0; self.best_reach=0; self.boarded={}; self.ride_since={}; self.used_targets=set()
         self.board=None  # (lift sector, deadline) after pressing a nearby lift switch
         self.known_reach=set(); self.taken=set(); self.health=100; self.advance_goal=None
-        self.gain_cache={}; self.health_since=0
+        self.gain_cache={}; self.required_cache={}; self.health_since=0
 
     def _update_dynamic(self):
         """Rasterize lines touching moving sectors from current heights; True if changed."""
@@ -387,6 +400,8 @@ class Navigator(LegacyNavigator):
                     # Never drop into a damaging pit: there may be no way back up.
                     if not self.free(node): continue
                     nd=d+(self.hazard_cost if self.hazard[node[1],node[0]] else 1)
+                    # Keep away from the edge above a damaging floor: momentum carries the player.
+                    if self.version=='improved2' and self.hazard_margin[node[1],node[0]]: nd+=2
                     if nd<dist.get(node,np.inf):
                         dist[node]=nd; parent[node]=(x,y); heapq.heappush(heap,(nd,node))
             return parent,dist
@@ -397,6 +412,52 @@ class Navigator(LegacyNavigator):
                 if node not in parent and self.free(node):
                     parent[node]=(x,y); dist[node]=dist[(x,y)]+1; queue.append(node)
         return parent,dist
+
+    def _crosses_hazard(self,a,b):
+        """From safe ground, would a straight walk from a to b step onto a damaging floor?"""
+        x,y=self.grid(a)
+        if not self.hazard.any() or not (0<=y<self.hazard.shape[0] and 0<=x<self.hazard.shape[1]) or self.hazard[y,x]: return False
+        for s in np.linspace(0,1,max(2,int(np.linalg.norm(b-a)/8)+1)):
+            x,y=self.grid(a+s*(b-a))
+            if 0<=y<self.hazard.shape[0] and 0<=x<self.hazard.shape[1] and self.hazard[y,x]: return True
+        return False
+
+    def _sector_contains(self,sid,point):
+        """Even-odd test of a point against the sector's edges."""
+        inside=False
+        for p,q in self.sector_edges.get(sid,()):
+            if (p[1]>point[1])!=(q[1]>point[1]) and point[0]<p[0]+(point[1]-p[1])*(q[0]-p[0])/(q[1]-p[1]): inside=not inside
+        return inside
+
+    def _required_sectors(self,start):
+        """Closed moving sectors on the optimistic route to the exit (or a missing key)."""
+        key=(frozenset(self.held),tuple(self.dynamic_state),self.reachable)
+        if key in self.required_cache: return self.required_cache[key]
+        self.dropping=True; parent,dist=self._search(start); self.dropping=False
+        nodes=np.array(list(parent)); points=nodes*self.cell+self.origin
+        targets=[a for a,_,_ in self.exit_approaches]
+        best=None
+        # A missing key comes first: the route to the exit usually leads through its locked door.
+        missing=[p for c,p in self.keys if c not in self.held]
+        for radius,group in ((56,missing),(32,targets)):
+            for point in group:
+                near=np.flatnonzero(np.linalg.norm(points-point,axis=1)<radius)
+                if len(near):
+                    i=min(near,key=lambda i:dist[tuple(nodes[i])])
+                    if best is None or dist[tuple(nodes[i])]<dist[best]: best=tuple(nodes[i])
+            if best is not None: break
+        required=set()
+        # A key on a raised pedestal: whatever moves the sector beneath it is required too.
+        for point in missing:
+            required|={sid for sid in self.dynamic_sectors if self._sector_contains(sid,point)}
+        if best is not None:
+            cells=set()
+            while best is not None:
+                cells.add(int(np.ravel_multi_index((best[1],best[0]),self.blocked.shape))); best=parent[best]
+            for (a,b,_,line),solid in zip(self.dynamic_lines,self.dynamic_state):
+                if solid and cells&set(line.tolist()): required|={a,b}&self.dynamic_sectors
+        self.required_cache[key]=required
+        return required
 
     def _trigger_gain(self,t,start,parent):
         """Value of opening t's target sectors: a key or exit made reachable, else new ground."""
@@ -462,6 +523,8 @@ class Navigator(LegacyNavigator):
                 for i in np.flatnonzero(np.linalg.norm(points-pos,axis=1)<48):
                     # The more hurt, the longer the detour worth taking.
                     limit=60 if self.health>=70 else np.inf
+                    # A key still to fetch outranks a long detour unless death is close.
+                    if self.version=='improved2' and self.health>=30 and any(c not in self.held for c,_ in self.keys): limit=60
                     if dist[nodes[i]]<limit: choices.append((dist[nodes[i]],nodes[i],pos,k))
             mode='health'
         if not choices:
@@ -489,6 +552,8 @@ class Navigator(LegacyNavigator):
             # Trapped on a damaging floor with no safe cell: retry escape triggers regardless of cooldown.
             trapped=(self.version=='improved2' and self.hazard[start[1],start[0]]
                      and all(self.hazard[n[1],n[0]] for n in parent))
+            required=self._required_sectors(start) if self.version=='improved2' else set()
+            critical=set()
             for t in self.triggers:
                 if t['until']>self.calls and not (trapped and t['pending'] is None): continue
                 if t['kind']=='switch':
@@ -504,7 +569,10 @@ class Navigator(LegacyNavigator):
                 if not len(hits): continue
                 i=min(hits,key=lambda i:dist[nodes[i]])
                 gain=self._trigger_gain(t,start,parent)
+                if t['targets']&required: critical.add(id(t))
                 choices.append((-gain/(1+dist[nodes[i]]/100),nodes[i],goals[i],id(t)))
+            # Backward planning: triggers the route to the exit depends on come first.
+            if critical: choices=[c for c in choices if c[3] in critical]
             mode='trigger'
         if mode=='trigger' and self.reachable>self.best_reach+50:
             # New territory: repeatable triggers may matter again.
@@ -560,26 +628,39 @@ class Navigator(LegacyNavigator):
             # Boarded from below: ride up, since the upper level only connects on arrival.
             # Boarded at the top: the lift is carrying us down, so step off at the bottom.
             if not (np.all(xy>=lo) and np.all(xy<=hi)):
-                self.boarded.pop(sid,None); continue
+                self.boarded.pop(sid,None); self.ride_since.pop(sid,None); continue
             lowered=self.heights[sid][0]<self.static_heights[sid][0]
             self.boarded.setdefault(sid,'below' if lowered else 'top')
             if not lowered: self.boarded[sid]='top'
             elif self.boarded[sid]=='below':
-                self.mode='ride'; self.path=[]; self.board=None
+                if self.version=='improved2':
+                    # A lift that stays down is not going to carry us: stop waiting on it.
+                    self.ride_since.setdefault(sid,self.calls)
+                    if self.calls-self.ride_since[sid]>60:
+                        self.boarded[sid]='top'; self.board=None; self.ride_since.pop(sid); continue
+                self.mode='ride'; self.path=[]
+                if self.version=='improved2': return self.lift_centers[sid],HOLD_INTERACTION  # keep boarding armed in case of overshoot
+                self.board=None
                 return self.lift_centers[sid],1e6
         if self.board is not None:
             sid,deadline=self.board
             if self.calls<deadline and self.heights[sid][0]<self.static_heights[sid][0]:
                 # The lift is down for only a few seconds: walk straight onto it.
                 self.mode='board'; self.path=[]
-                return self.lift_centers[sid],1e6
+                return self.lift_centers[sid],HOLD_INTERACTION if self.version=='improved2' else 1e6
             if self.calls>=deadline: self.board=None
         for t in self.triggers:
             if t['pending'] is not None:
                 # A press only counts once a target sector actually moves; otherwise retry later.
                 deadline,base=t['pending']
                 if [tuple(self.heights[i]) for i in sorted(t['targets'])]!=base: t['pending']=None
-                elif self.calls>=deadline: t['pending']=None; t['until']=0; self.path=[]
+                elif self.calls>=deadline:
+                    t['pending']=None; t['until']=0; self.path=[]
+                    if self.version=='improved2':
+                        # A missed press also must not leave its sibling switches or boarding armed.
+                        self.board=None; self.used_targets-=t['targets']; self.trigger_goal=id(t); self.trigger_since=self.calls
+                        for other in self.triggers:
+                            if other is not t and other['targets']==t['targets'] and not other['once']: other['until']=0
             if t['until']>self.calls: continue
             delta=t['q']-t['p']; s=np.clip(np.dot(xy-t['p'],delta)/max(np.dot(delta,delta),1),0,1)
             d=np.linalg.norm(xy-(t['p']+s*delta))
@@ -587,6 +668,12 @@ class Navigator(LegacyNavigator):
                 # USE reaches the first line along the view ray: require the front side and facing it.
                 facing=yaw is not None and np.dot([np.cos(np.radians(yaw)),np.sin(np.radians(yaw))],-t['normal'])>.7
                 fired=d<64 and last_action in (12,13) and (xy-t['p'])@t['normal']>0 and facing
+                if fired and self.version=='improved2':
+                    # A glancing ray hits the neighbouring wall: the view ray must cross the switch itself.
+                    ray=np.array([np.cos(np.radians(yaw)),np.sin(np.radians(yaw))])
+                    along=(t['p']-xy)@t['normal']/(ray@t['normal'])
+                    hit=xy+ray*along
+                    fired=0<along<64 and 0<=(hit-t['p'])@delta<=delta@delta
             elif self.last_xy is None: fired=False
             elif t['kind']=='teleport':
                 fired=np.linalg.norm(xy-self.last_xy)>96 and np.linalg.norm(self.last_xy-t['mid'])<64
@@ -596,7 +683,9 @@ class Navigator(LegacyNavigator):
             if fired:
                 t['until']=np.inf if t['once'] else self.calls+300; self.path=[]; self.used_targets|=t['targets']
                 if t['kind']!='teleport':
-                    t['pending']=(self.calls+60,[tuple(self.heights[i]) for i in sorted(t['targets'])])
+                    # Sectors start moving as soon as a switch works, so a miss shows within a few calls.
+                    wait=8 if self.version=='improved2' and t['kind']=='switch' else 60
+                    t['pending']=(self.calls+wait,[tuple(self.heights[i]) for i in sorted(t['targets'])])
                 if self.version=='improved2':
                     near_lift=[sid for sid in t['targets'] if sid in self.lift_centers
                                and np.linalg.norm(self.lift_centers[sid]-xy)<160]
@@ -636,6 +725,7 @@ class Navigator(LegacyNavigator):
         for waypoint in self.path[:8]:
             point=self.world(waypoint)
             if np.linalg.norm(point-xy)>96 or not self.clear(xy,point): break
+            if self.version=='improved2' and self._crosses_hazard(xy,point): break
             target=point
         if self.goal is not None and np.linalg.norm(xy-self.goal)<72:
             target=self.goal.copy()
@@ -653,4 +743,9 @@ class Navigator(LegacyNavigator):
             if d<80 and np.dot(mid-xy,target-xy)>0:
                 delta=q-p; t=np.clip(np.dot(xy-p,delta)/max(np.dot(delta,delta),1),0,1)
                 near=min(near,np.linalg.norm(xy-(p+t*delta)))
+        if self.version=='improved2' and near>=128 and self.hazard.any():
+            # Standing beside (not in) a damaging floor: tell the teacher not to charge.
+            x,y=node
+            if 0<=y<self.hazard.shape[0] and 0<=x<self.hazard.shape[1] and not self.hazard[y,x] and self.hazard[max(y-3,0):y+4,max(x-3,0):x+4].any():
+                near=LEDGE_INTERACTION
         return target,near

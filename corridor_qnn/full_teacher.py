@@ -34,9 +34,17 @@ def teacher_action(features):
     # Back off while firing at an aimed enemy in melee range (demons close in fast).
     if fight and f[14]*800<128 and abs(math.atan2(f[13],f[12]))<=.12: return 20
     if fight or (f[31]>.5 and f[3]*9<3):
-        return legacy_teacher_action(f)
+        action=legacy_teacher_action(f)
+        # Next to a damaging floor: hold position and shoot rather than charge off the ledge.
+        return 6 if action==7 and abs(f[11]-3.25)<1e-3 else action
     wb=math.atan2(f[9],f[8])
     last=int(np.argmax(f[len(BASE_FEATURES):])) if f[len(BASE_FEATURES):].sum() else -1
+    # Lift ride: momentum carries the player off a small platform, so brake and then stand still.
+    if abs(f[11]-3.125)<1e-3:
+        if f[10]*256<20: return 12
+        if f[10]*256<48 and f[21]*20>6 and abs(wb)<=.25: return 1
+    # Beside a damaging floor: coast down to walking speed so momentum cannot carry us off the edge.
+    if abs(f[11]-3.25)<1e-3 and f[21]*20>24: return 12
     # A turn action rotates up to ~28 degrees; a narrower dead zone than half of
     # that can oscillate left/right forever around a waypoint.
     if wb>.25: return 2

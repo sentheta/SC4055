@@ -186,8 +186,56 @@ Literature consulted: trainable-encoding re-uploading (arXiv 2606.25598),
 component evaluation of quantum RL (2511.17112), classical surrogates of
 quantum policies (2609.16266). New opt-in options: `--reupload`, `--zz`
 (all ZZ correlators), `--no-residual` (policy from measurements only).
-All compared on v3's 100k decisions, same initialisation; results below as
-they arrive.
+All compared on v3's 100k decisions, same initialisation, 12 epochs, seeds
+800-869:
+
+| Model | Completed |
+| --- | --- |
+| `e1m2_v3` (baseline, quantum on) | 66/70 |
+| `e1m2_v3`, quantum gain 0 | 64/70 |
+| classical, retrained | 62/70 |
+| quantum, re-uploading, 4 layers | 61/70 |
+| quantum, re-uploading, 2 layers | 59/70 |
+| classical, ZZ, no residual (control) | 58/70 |
+| quantum, re-uploading + ZZ, no residual | 53/70 |
+| quantum, re-uploading, no residual | 50/70 |
+
+No new circuit beat the baseline. These are single training runs, so gaps of a
+few episodes are within noise, including the baseline's lead over the retrained
+models. The one clear signal is that removing the residual hurt the quantum
+models (50-53/70 against 59-61/70 with it). The classical no-residual control
+reached 58/70, so the circuit-only policy trails its classical equivalent.
+
+### E1M3: why every seed died (01:50, 31 Oct)
+
+Correction: the north nukage room is on the route, not off it, as noted earlier.
+The real order, read from the WAD:
+
+1. Lift 91 (switches at (-288, 2456) and (-288, 2336)) climbs out of the nukage
+   onto ledge sector 92.
+2. Walk lines at x=480 lower lifts 138/139, giving access to the east side.
+3. Switch (1052, 2612), tag 9, lowers pedestal sector 117 under the blue key at
+   (432, 2608).
+4. Blue door (-1136, 104) opens the west region: switch (-2076, 2424) raises
+   sector 146.
+5. Switch (-88, 896) lowers door 236; exit at (284, 1483).
+
+Faults found by tracing, all fixed behind `improved2`:
+
+- Missed presses counted as presses: a sector that has not moved 8 calls after
+  the press now means a retry.
+- Momentum carried the player off small lifts: `HOLD_INTERACTION` makes the
+  teacher brake and stand still, with a 60-call limit for lifts that stay down.
+- Path smoothing cut across pits: lookahead may not cross damaging cells, and
+  routes pay extra beside them.
+- Charging enemies and running beside pits walked the player off ledges:
+  `LEDGE_INTERACTION` stops the charge and caps speed.
+- Backward planning chased the exit while the key was missing, and its cache
+  ignored the player's region: missing keys and their pedestals now come first.
+- A far medkit outranked the key: long health detours now wait for HP below 30.
+
+Teacher, seeds 800-807: still 0/8 completed, but deaths fell from 8 to 4 and
+some seeds now reach the east side. No key pickup yet.
 
 ## E1M3 (started 00:20, 30 Oct)
 
