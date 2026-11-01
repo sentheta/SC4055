@@ -28,6 +28,8 @@ MEMORY = ('keys_blue', 'keys_yellow', 'keys_red', 'pos_x', 'pos_y', 'moved8_x', 
 PLAYER_NAMES = HUD + MEMORY + tuple(f'last_{i}' for i in range(len(ACTIONS)))
 PLAYER_DIM = len(PLAYER_NAMES)
 POS = PLAYER_NAMES.index('pos_x')
+# Training-only targets for an auxiliary head; they are never inputs, so play stays player-view.
+AUX_INDEX = [BASE_FEATURES.index(n) for n in PRIVILEGED[:13]]
 FRAMES = 3
 
 
@@ -65,9 +67,10 @@ class PlayerView:
 class PlayerModel(nn.Module):
     """Pixels and player features -> CNN and MLP -> 6 angles -> circuit -> action logits."""
 
-    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False):
+    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False, aux=False):
         super().__init__()
         self.kind, self.qubits, self.layers, self.hidden, self.bands = kind, qubits, layers, hidden, bands
+        hidden_vision = 64
         self.vision = nn.Sequential(
             nn.Conv2d(FRAMES, 16, 5, stride=3), nn.ReLU(), nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),
             nn.Conv2d(32, 32, 3, stride=2), nn.ReLU(), nn.Flatten(), nn.Linear(32*4*7, 64), nn.ReLU())
@@ -81,30 +84,33 @@ class PlayerModel(nn.Module):
         self.actor = nn.Linear(qubits, len(ACTIONS))
         self.classical_actor = nn.Linear(48, len(ACTIONS))
         self.quantum_gain = nn.Parameter(torch.tensor(1.0))
+        self.aux_head = nn.Linear(hidden_vision, len(AUX_INDEX)) if aux else None
 
-    def forward(self, pixels, features):
+    def forward(self, pixels, features, return_aux=False):
         # Fourier features let the network carve the map into small regions from (x, y).
         xy = features[:, POS:POS+2]*4096
         scales = 2.0**torch.arange(self.bands, device=xy.device)*(2*math.pi/4096)
         phase = (xy.unsqueeze(-1)*scales).flatten(1)
-        fused = self.fusion(torch.cat([self.vision(pixels.float()/255), features, phase.sin(), phase.cos()], -1))
+        seen = self.vision(pixels.float()/255)
+        fused = self.fusion(torch.cat([seen, features, phase.sin(), phase.cos()], -1))
         a = self.angles(fused)
         measured = self.core(a*math.pi) if self.kind == 'quantum' else self.core(a)
-        return self.classical_actor(fused)+self.quantum_gain*self.actor(measured)
+        logits = self.classical_actor(fused)+self.quantum_gain*self.actor(measured)
+        return (logits, self.aux_head(seen)) if return_aux else logits
 
 
 def save_player(path, model, metadata):
     from pathlib import Path
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     torch.save(dict(schema=SCHEMA, kind=model.kind, qubits=model.qubits, layers=model.layers, hidden=model.hidden,
-                    bands=model.bands, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
+                    bands=model.bands, aux=model.aux_head is not None, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
 
 
 def load_player(path):
     data = torch.load(path, map_location='cpu', weights_only=True)
     if data['schema'] != SCHEMA or data['names'] != list(PLAYER_NAMES):
         raise ValueError('Incompatible player checkpoint')
-    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'])
+    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False))
     model.load_state_dict(data['state_dict'])
     return model.eval()
 

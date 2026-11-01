@@ -363,3 +363,11 @@ circuit, unlike `e1m2_v3` (64/70 against 66/70), with a similar learned gain (2.
 against 2.23). It does not show a quantum advantage: removing a trained component
 says nothing about what a classical model trained on the same data would reach.
 That comparison has not been run on E1M3 and is the next experiment to do.
+
+## Player-view student (no privileged inputs)
+
+The student no longer receives planner, engine-label or depth features. Inputs: 3 stacked frames, HUD values, its own motion, dead-reckoned position from the start, recent displacement, USE count, cell revisits and last action. Two caveats: the key flags are read from `navigator.held`, which is equivalent to the HUD, and the map is not given, so it must be learned from experience on that level. The privileged teacher still labels every decision (DAgger).
+
+E1M1 (`outputs/p/e1m1_a`): 0/20 in rounds 0-2, then 7, 14, 16, 13, 12, 19, 18, 15, 18, 16 of 20 in rounds 3-12 on seeds 800-819. These round scores are noisy. Fine-tuning on all data (15 epochs, LR 2e-4) gave 36/40 on seeds 900-939, which were not used to compare rounds; m12 got 32/40 and m8, the best round on 800-819, got 21/40.
+
+E1M2 (`outputs/p/e1m2_a`): 0/20 in all 12 rounds, with 9-16 deaths at about 60 cells. Raising BETA from 0.3 to 0.7 restored collection coverage (about 440 cells) but not the student's score. Next attempt (`e1m2_b`): a training-only auxiliary head on the CNN predicting enemy, waypoint and depth features. These are targets, never inputs.

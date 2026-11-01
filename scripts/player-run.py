@@ -18,7 +18,7 @@ def run(args):
     torch.set_num_threads(1)
     from corridor_qnn.full_environment import FullDoom
     from corridor_qnn.full_teacher import teacher_action
-    from corridor_qnn.player import PlayerView, load_player, act
+    from corridor_qnn.player import AUX_INDEX, PlayerView, load_player, act
     model = load_player(ckpt) if ckpt != 'none' else None
     if model is not None and os.environ.get('NO_QUANTUM') == '1':
         with torch.no_grad():
@@ -32,12 +32,12 @@ def run(args):
     view = PlayerView(env); view.reset()
     obs = env.reset(seed=seed)
     rng = np.random.default_rng(seed)
-    images, features, labels = [], [], []
+    images, features, labels, aux = [], [], [], []
     while True:
         view.vector = view.update(obs)
         if mode == 'collect':
             label = teacher_action(obs.features)
-            images.append(obs.pixels); features.append(view.vector); labels.append(label)
+            images.append(obs.pixels); features.append(view.vector); labels.append(label); aux.append(obs.features[AUX_INDEX])
             action = label if model is None or rng.random() < beta else act(model, view)
         else:
             action = act(model, view)
@@ -46,7 +46,7 @@ def run(args):
             break
     env.close()
     row = (seed, info['outcome'], info['steps'], int(info['kills']), info['coverage_cells'], sorted(view.env.navigator.held))
-    return row, (np.stack(images), np.stack(features), np.asarray(labels)) if mode == 'collect' else None
+    return row, (np.stack(images), np.stack(features), np.asarray(labels), np.stack(aux, dtype=np.float32)) if mode == 'collect' else None
 
 
 def main():
@@ -71,6 +71,7 @@ def main():
         np.savez_compressed(out, images=np.concatenate([r[1][0] for r in results]),
                             features=np.concatenate([r[1][1] for r in results]),
                             labels=np.concatenate([r[1][2] for r in results]),
+                            aux=np.concatenate([r[1][3] for r in results]),
                             episode_ids=np.concatenate([np.full(len(r[1][2]), i) for i, r in enumerate(results)]))
 
 

@@ -1,6 +1,6 @@
 """Behaviour cloning for the player-view student.
 
-  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN)
+  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss)
 """
 import json
 import os
@@ -9,18 +9,23 @@ import time
 import numpy as np
 import torch
 from corridor_qnn.full_actions import ACTIONS
-from corridor_qnn.player import PlayerModel, load_player, save_player, stack_indices
+from corridor_qnn.player import AUX_INDEX, PlayerModel, load_player, save_player, stack_indices
 
 out, epochs, kind, init, paths = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5:]
 torch.manual_seed(0); rng = np.random.default_rng(0)
 torch.set_num_threads(int(os.environ.get('THREADS', 8)))
-images, features, labels, episodes = [], [], [], []; offset = 0
+images, features, labels, episodes, aux = [], [], [], [], []; offset = 0
 for path in paths:
     data = np.load(path)
     images.append(data['images']); features.append(data['features']); labels.append(data['labels'])
+    # Older datasets have no auxiliary targets: NaN rows are masked out of the loss.
+    aux.append(data['aux'] if 'aux' in data else np.full((len(data['labels']), len(AUX_INDEX)), np.nan, np.float32))
     episodes.append(data['episode_ids']+offset); offset = episodes[-1].max()+1
-images, features, labels, episodes = (np.concatenate(v) for v in (images, features, labels, episodes))
-model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)))
+images, features, labels, episodes, aux = (np.concatenate(v) for v in (images, features, labels, episodes, aux))
+aux_weight = float(os.environ.get('AUX', 0))
+model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0)
+if aux_weight > 0 and model.aux_head is None:
+    model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
 held = episodes == episodes.max()
 train = np.flatnonzero(~held); val = np.flatnonzero(held)
 counts = np.bincount(labels[train], minlength=len(ACTIONS))
@@ -42,7 +47,13 @@ for epoch in range(1, epochs+1):
     order = rng.permutation(train)
     for k in range(0, len(order), 256):
         x, f, y = batch(order[k:k+256])
-        loss = torch.nn.functional.cross_entropy(model(x, f), y, weight=weights)
+        if aux_weight > 0:
+            logits, predicted = model(x, f, return_aux=True)
+            target = torch.from_numpy(aux[order[k:k+256]]); mask = ~target.isnan()
+            extra = ((predicted-target.nan_to_num())[mask]**2).mean() if mask.any() else 0.
+        else:
+            logits, extra = model(x, f), 0.
+        loss = torch.nn.functional.cross_entropy(logits, y, weight=weights)+aux_weight*extra
         opt.zero_grad(set_to_none=True); loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 2); opt.step()
         if sched.last_epoch < steps-1:
