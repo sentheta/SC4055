@@ -375,3 +375,7 @@ E1M2 (`outputs/p/e1m2_a`): 0/20 in all 12 rounds, with 9-16 deaths at about 60 c
 E1M1 checks on seeds 900-939: quantum 36/40, classical trained from scratch on the same data 33/40, quantum with gain zeroed 34/40. No quantum advantage is shown. PennyLane matches torch at 17/20 on seeds 900-919, with logits within 4e-6. Exported to `results/player/E1M1`.
 
 E1M2 `e1m2_b` with the auxiliary head: 0/20 in rounds 12-15 and after fine-tuning on seeds 900-919, with 9-13 deaths and the remaining episodes timing out at low coverage (about 65 cells). Sampling actions did not help: T=0.5 0/20 (12 deaths), T=1 0/20 (18 deaths).
+
+E1M2 larger model (hidden 512, from scratch on all data, auxiliary head): 0/20 with 8 deaths on seeds 900-919. After a low-rate fine-tune: big2: eval E1M2 completed 0 / 20 | deaths 13 | mean cells 88 | keys 6 06:38.
+
+Where this stands: E1M1 meets the 90% target from the player view. E1M2 does not, at 0/20 across every variant tried, and E1M3 onward were not attempted because they depend on E1M2 working. Held-out accuracy stays near 70% and the student either dies early or wanders at about 65 cells of the roughly 450 the teacher covers. The student has no recurrent memory and only a 64x96 view. Untried next steps: a GRU, higher resolution, and much more data from the early part of the level.
