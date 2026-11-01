@@ -4,7 +4,7 @@
                                                                          it also acts with probability BETA.
   player-run.py eval CHECKPOINT MAP STEPS SEED...                        student acts alone.
 
-Env: JOBS (default 10), NO_QUANTUM=1 zeroes the quantum gain, PENNYLANE=1 runs the circuit in PennyLane.
+Env: JOBS (default 10), TEMP>0 samples eval actions, NO_QUANTUM=1 zeroes the quantum gain, PENNYLANE=1 runs the circuit in PennyLane.
 """
 import os
 import sys
@@ -15,7 +15,7 @@ import numpy as np
 def run(args):
     mode, ckpt, name, steps, beta, seed = args
     import torch
-    torch.set_num_threads(1)
+    torch.set_num_threads(1); torch.manual_seed(seed)
     from corridor_qnn.full_environment import FullDoom
     from corridor_qnn.full_teacher import teacher_action
     from corridor_qnn.player import AUX_INDEX, PlayerView, load_player, act
@@ -40,7 +40,7 @@ def run(args):
             images.append(obs.pixels); features.append(view.vector); labels.append(label); aux.append(obs.features[AUX_INDEX])
             action = label if model is None or rng.random() < beta else act(model, view)
         else:
-            action = act(model, view)
+            action = act(model, view, float(os.environ.get('TEMP', 0)))
         obs, _, done, info = env.step(action)
         if done:
             break

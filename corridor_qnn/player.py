@@ -125,7 +125,9 @@ def stack_indices(episode_ids, idx):
 
 
 @torch.no_grad()
-def act(model, view):
+def act(model, view, temperature=0.):
     pixels = torch.from_numpy(view.stack()).unsqueeze(0)
     features = torch.from_numpy(view.vector).unsqueeze(0)
-    return int(model(pixels, features).argmax(-1))
+    logits = model(pixels, features)
+    # Sampling lets a stuck student leave a loop that a deterministic argmax would repeat forever.
+    return int(torch.multinomial((logits/temperature).softmax(-1), 1)) if temperature > 0 else int(logits.argmax(-1))

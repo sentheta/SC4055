@@ -371,3 +371,7 @@ The student no longer receives planner, engine-label or depth features. Inputs: 
 E1M1 (`outputs/p/e1m1_a`): 0/20 in rounds 0-2, then 7, 14, 16, 13, 12, 19, 18, 15, 18, 16 of 20 in rounds 3-12 on seeds 800-819. These round scores are noisy. Fine-tuning on all data (15 epochs, LR 2e-4) gave 36/40 on seeds 900-939, which were not used to compare rounds; m12 got 32/40 and m8, the best round on 800-819, got 21/40.
 
 E1M2 (`outputs/p/e1m2_a`): 0/20 in all 12 rounds, with 9-16 deaths at about 60 cells. Raising BETA from 0.3 to 0.7 restored collection coverage (about 440 cells) but not the student's score. Next attempt (`e1m2_b`): a training-only auxiliary head on the CNN predicting enemy, waypoint and depth features. These are targets, never inputs.
+
+E1M1 checks on seeds 900-939: quantum 36/40, classical trained from scratch on the same data 33/40, quantum with gain zeroed 34/40. No quantum advantage is shown. PennyLane matches torch at 17/20 on seeds 900-919, with logits within 4e-6. Exported to `results/player/E1M1`.
+
+E1M2 `e1m2_b` with the auxiliary head: 0/20 in rounds 12-15 and after fine-tuning on seeds 900-919, with 9-13 deaths and the remaining episodes timing out at low coverage (about 65 cells). Sampling actions did not help: T=0.5 0/20 (12 deaths), T=1 0/20 (18 deaths).
