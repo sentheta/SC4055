@@ -1,6 +1,6 @@
 """Behaviour cloning for the player-view student.
 
-  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss)
+  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss, MEMORY=sequence length for a GRU student)
 """
 import json
 import os
@@ -29,13 +29,18 @@ aux_weight = float(os.environ.get('AUX', 0))
 model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0, rgb=images.ndim == 4)
 if aux_weight > 0 and model.aux_head is None:
     model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
+seq = int(os.environ.get('MEMORY', 0))
+if seq and model.gru is None:
+    model.gru = torch.nn.GRU(48, 48, batch_first=True)
 held = episodes == episodes.max()
 train = np.flatnonzero(~held); val = np.flatnonzero(held)
 counts = np.bincount(labels[train], minlength=len(ACTIONS))
 weights = torch.tensor(np.where(counts > 0, np.sqrt(counts.max()/np.maximum(counts, 1)), 0), dtype=torch.float32)
 lr = float(os.environ.get('LR', 1e-3))
 opt = torch.optim.Adam(model.parameters(), lr=lr)
-steps = epochs*(len(train)//256+1)
+per = 12 if seq else 256  # batch of 12 sequences, or of 256 frames
+unit = max(seq, 1)
+steps = epochs*(len(train)//(per*unit)+1)
 sched = torch.optim.lr_scheduler.OneCycleLR(opt, lr, total_steps=steps, pct_start=.1)
 history = []; started = time.time()
 
@@ -48,14 +53,19 @@ def batch(idx):
 for epoch in range(1, epochs+1):
     model.train(); total = 0.
     order = rng.permutation(train)
-    for k in range(0, len(order), 256):
-        x, f, y = batch(order[k:k+256])
+    if seq:
+        # Windows that stay inside one episode.
+        order = order[(order+seq <= len(episodes)) & (episodes[np.minimum(order+seq-1, len(episodes)-1)] == episodes[order])][:len(train)//seq]
+    for k in range(0, len(order), per):
+        chosen = order[k:k+per]
+        chosen = (chosen[:, None]+np.arange(seq)).ravel() if seq else chosen
+        x, f, y = batch(chosen)
         if aux_weight > 0:
-            logits, predicted = model(x, f, return_aux=True)
-            target = torch.from_numpy(aux[order[k:k+256]]); mask = ~target.isnan()
+            logits, predicted = model(x, f, return_aux=True, seq=unit)
+            target = torch.from_numpy(aux[chosen]); mask = ~target.isnan()
             extra = ((predicted-target.nan_to_num())[mask]**2).mean() if mask.any() else 0.
         else:
-            logits, extra = model(x, f), 0.
+            logits, extra = model(x, f, seq=unit), 0.
         loss = torch.nn.functional.cross_entropy(logits, y, weight=weights)+aux_weight*extra
         opt.zero_grad(set_to_none=True); loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 2); opt.step()
@@ -65,7 +75,10 @@ for epoch in range(1, epochs+1):
     model.eval(); correct = 0
     with torch.no_grad():
         for k in range(0, len(val), 512):
-            x, f, y = batch(val[k:k+512]); correct += (model(x, f).argmax(-1) == y).sum().item()
+            x, f, y = batch(val[k:k+512])
+            # The held-out episode runs as one sequence in chunks, keeping memory between them.
+            logits = model(x, f, seq=len(y), hidden=None if k == 0 else model.last_hidden) if seq else model(x, f)
+            correct += (logits.argmax(-1) == y).sum().item()
     row = dict(epoch=epoch, loss=total/len(train), episode_heldout_accuracy=correct/max(len(val), 1))
     history.append(row); print('EPOCH', json.dumps(row), round(time.time()-started), flush=True)
 save_player(out, model, dict(datasets=paths, samples=len(labels), history=history))

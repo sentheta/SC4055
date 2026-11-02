@@ -46,7 +46,7 @@ class PlayerView:
         return np.asarray(Image.fromarray(obs.frame).resize((96, 64), Image.BILINEAR))
 
     def reset(self):
-        self.pos = np.zeros(2); self.trail = deque(maxlen=33); self.uses = 0
+        self.hidden = None; self.pos = np.zeros(2); self.trail = deque(maxlen=33); self.uses = 0
         self.cells = {}; self.frames = deque(maxlen=FRAMES)
 
     def update(self, obs):
@@ -89,12 +89,14 @@ class PlayerModel(nn.Module):
             self.core = nn.Sequential(nn.Linear(qubits, 32), nn.Tanh(), nn.Linear(32, qubits), nn.Tanh())
         self.actor = nn.Linear(qubits, len(ACTIONS))
         self.classical_actor = nn.Linear(48, len(ACTIONS))
+        # Memory: a GRU over the fused features, added residually so it can extend a memoryless model.
+        self.gru = nn.GRU(48, 48, batch_first=True) if memory else None
         self.quantum_gain = nn.Parameter(torch.tensor(1.0))
         # RGB models predict what is visible from vision and the route (4 targets) from the fused map features.
         self.aux_head = nn.Linear(hidden_vision, len(AUX_INDEX)-4 if rgb else len(AUX_INDEX)) if aux else None
         self.aux_route = nn.Linear(48, 4) if aux and rgb else None
 
-    def forward(self, pixels, features, return_aux=False):
+    def forward(self, pixels, features, return_aux=False, hidden=None, seq=1):
         # Fourier features let the network carve the map into small regions from (x, y).
         if pixels.dim() == 5:
             pixels = pixels.permute(0, 1, 4, 2, 3).flatten(1, 2)
@@ -103,6 +105,10 @@ class PlayerModel(nn.Module):
         phase = (xy.unsqueeze(-1)*scales).flatten(1)
         seen = self.vision(pixels.float()/255)
         fused = self.fusion(torch.cat([seen, features, phase.sin(), phase.cos()], -1))
+        if self.gru is not None:
+            # Inputs are flattened (batch*seq, ...); seq is the sequence length.
+            out, self.last_hidden = self.gru(fused.view(-1, seq, 48), hidden)
+            fused = fused+out.reshape(-1, 48)
         a = self.angles(fused)
         measured = self.core(a*math.pi) if self.kind == 'quantum' else self.core(a)
         logits = self.classical_actor(fused)+self.quantum_gain*self.actor(measured)
@@ -115,14 +121,14 @@ def save_player(path, model, metadata):
     from pathlib import Path
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     torch.save(dict(schema=SCHEMA, kind=model.kind, qubits=model.qubits, layers=model.layers, hidden=model.hidden,
-                    bands=model.bands, aux=model.aux_head is not None, rgb=model.rgb, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
+                    bands=model.bands, aux=model.aux_head is not None, rgb=model.rgb, memory=model.gru is not None, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
 
 
 def load_player(path):
     data = torch.load(path, map_location='cpu', weights_only=True)
     if data['schema'] != SCHEMA or data['names'] != list(PLAYER_NAMES):
         raise ValueError('Incompatible player checkpoint')
-    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False), rgb=data.get('rgb', False))
+    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False), rgb=data.get('rgb', False), memory=data.get('memory', False))
     model.load_state_dict(data['state_dict'])
     return model.eval()
 
@@ -140,6 +146,8 @@ def stack_indices(episode_ids, idx):
 def act(model, view, temperature=0.):
     pixels = torch.from_numpy(view.stack()).unsqueeze(0)
     features = torch.from_numpy(view.vector).unsqueeze(0)
-    logits = model(pixels, features)
+    logits = model(pixels, features, hidden=view.hidden)
+    if model.gru is not None:
+        view.hidden = model.last_hidden
     # Sampling lets a stuck student leave a loop that a deterministic argmax would repeat forever.
     return int(torch.multinomial((logits/temperature).softmax(-1), 1)) if temperature > 0 else int(logits.argmax(-1))

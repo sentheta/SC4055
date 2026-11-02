@@ -14,6 +14,6 @@ for r in $(seq ${START:-0} $ROUNDS); do
     $P scripts/player-run.py collect $D/d$r.npz $MAP $STEPS $BETA $D/m$((r-1)).pt $(seq $S $((S+EP-1))) 2>&1 | grep -E "^collect|Error"
     INIT=$D/m$((r-1)).pt; E=${E1:-6}
   fi
-  LR=${LR:-1e-3} THREADS=${THREADS:-10} $P scripts/player-train.py $D/m$r.pt $E $KIND $INIT $D/d[0-9]*.npz 2>&1 | grep EPOCH | tail -1 | cut -c1-110
+  LR=${LR:-1e-3} THREADS=${THREADS:-10} $P scripts/player-train.py $D/m$r.pt $E $KIND $INIT $(ls -v $D/d[0-9]*.npz | tail -n ${KEEP:-1000}) 2>&1 | grep EPOCH | tail -1 | cut -c1-110
   echo "round $r: $($P scripts/player-run.py eval $D/m$r.pt $MAP $STEPS $EVAL 2>&1 | grep -E '^eval|Error') $(date +%H:%M)"
 done
