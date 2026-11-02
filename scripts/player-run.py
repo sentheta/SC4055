@@ -4,7 +4,7 @@
                                                                          it also acts with probability BETA.
   player-run.py eval CHECKPOINT MAP STEPS SEED...                        student acts alone.
 
-Env: JOBS (default 10), TEMP>0 samples eval actions, NO_QUANTUM=1 zeroes the quantum gain, PENNYLANE=1 runs the circuit in PennyLane.
+Env: JOBS (default 10), TEMP>0 samples eval actions, RGB=1 records colour frames, COLLECT_LIMIT stops collection early, NO_QUANTUM=1 zeroes the quantum gain, PENNYLANE=1 runs the circuit in PennyLane.
 """
 import os
 import sys
@@ -29,7 +29,8 @@ def run(args):
         pl = importlib.util.module_from_spec(spec); spec.loader.exec_module(pl)
         model = pl.to_pennylane(model)
     env = FullDoom(map=name, max_steps=steps, auto_weapon=True, navigation='improved2')
-    view = PlayerView(env); view.reset()
+    rgb = model.rgb if model is not None else os.environ.get('RGB') == '1'
+    view = PlayerView(env, rgb); view.reset()
     obs = env.reset(seed=seed)
     rng = np.random.default_rng(seed)
     images, features, labels, aux = [], [], [], []
@@ -37,12 +38,12 @@ def run(args):
         view.vector = view.update(obs)
         if mode == 'collect':
             label = teacher_action(obs.features)
-            images.append(obs.pixels); features.append(view.vector); labels.append(label); aux.append(obs.features[AUX_INDEX])
+            images.append(view.current); features.append(view.vector); labels.append(label); aux.append(obs.features[AUX_INDEX])
             action = label if model is None or rng.random() < beta else act(model, view)
         else:
             action = act(model, view, float(os.environ.get('TEMP', 0)))
         obs, _, done, info = env.step(action)
-        if done:
+        if done or (mode == 'collect' and len(labels) >= int(os.environ.get('COLLECT_LIMIT', 10**9))):
             break
     env.close()
     row = (seed, info['outcome'], info['steps'], int(info['kills']), info['coverage_cells'], sorted(view.env.navigator.held))

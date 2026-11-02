@@ -14,16 +14,19 @@ from corridor_qnn.player import AUX_INDEX, PlayerModel, load_player, save_player
 out, epochs, kind, init, paths = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5:]
 torch.manual_seed(0); rng = np.random.default_rng(0)
 torch.set_num_threads(int(os.environ.get('THREADS', 8)))
-images, features, labels, episodes, aux = [], [], [], [], []; offset = 0
-for path in paths:
+# Filled in place: colour frames are large and a list-then-concatenate would double peak memory.
+sizes = [len(np.load(p)['labels']) for p in paths]; total = sum(sizes); first = np.load(paths[0])
+images = np.empty((total, *first['images'].shape[1:]), np.uint8); features = np.empty((total, first['features'].shape[1]), np.float32)
+labels = np.empty(total, np.int64); episodes = np.empty(total, np.int64); aux = np.full((total, len(AUX_INDEX)), np.nan, np.float32)
+at = offset = 0
+for path, n in zip(paths, sizes):
     data = np.load(path)
-    images.append(data['images']); features.append(data['features']); labels.append(data['labels'])
-    # Older datasets have no auxiliary targets: NaN rows are masked out of the loss.
-    aux.append(data['aux'] if 'aux' in data else np.full((len(data['labels']), len(AUX_INDEX)), np.nan, np.float32))
-    episodes.append(data['episode_ids']+offset); offset = episodes[-1].max()+1
-images, features, labels, episodes, aux = (np.concatenate(v) for v in (images, features, labels, episodes, aux))
+    images[at:at+n] = data['images']; features[at:at+n] = data['features']; labels[at:at+n] = data['labels']
+    if 'aux' in data:
+        aux[at:at+n] = data['aux']  # older datasets stay NaN and are masked out of the loss
+    episodes[at:at+n] = data['episode_ids']+offset; offset = episodes[at+n-1]+1; at += n
 aux_weight = float(os.environ.get('AUX', 0))
-model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0)
+model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0, rgb=images.ndim == 4)
 if aux_weight > 0 and model.aux_head is None:
     model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
 held = episodes == episodes.max()

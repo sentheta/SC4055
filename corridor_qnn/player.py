@@ -7,6 +7,7 @@ import math
 from collections import deque
 import numpy as np
 import torch
+from PIL import Image
 from torch import nn
 from .full_actions import ACTIONS
 from .full_environment import BASE_FEATURES
@@ -36,8 +37,13 @@ FRAMES = 3
 class PlayerView:
     """Turns an environment observation into the student's input, keeping episode memory."""
 
-    def __init__(self, env):
-        self.env = env
+    def __init__(self, env, rgb=False):
+        self.env, self.rgb = env, rgb
+
+    def frame(self, obs):
+        if not self.rgb:
+            return obs.pixels
+        return np.asarray(Image.fromarray(obs.frame).resize((96, 64), Image.BILINEAR))
 
     def reset(self):
         self.pos = np.zeros(2); self.trail = deque(maxlen=33); self.uses = 0
@@ -56,7 +62,7 @@ class PlayerView:
         held = self.env.navigator.held  # the keys shown on the HUD
         vector = [*f[HUD_INDEX], *(float(c in held) for c in KEY_COLORS), *(self.pos/4096), *moved(8), *moved(32),
                   self.uses/32, min(self.cells[cell]/32, 4), *last]
-        self.frames.append(obs.pixels)
+        self.current = self.frame(obs); self.frames.append(self.current)
         return np.asarray(vector, dtype=np.float32)
 
     def stack(self):
@@ -67,12 +73,12 @@ class PlayerView:
 class PlayerModel(nn.Module):
     """Pixels and player features -> CNN and MLP -> 6 angles -> circuit -> action logits."""
 
-    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False, aux=False):
+    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False, aux=False, rgb=False):
         super().__init__()
-        self.kind, self.qubits, self.layers, self.hidden, self.bands = kind, qubits, layers, hidden, bands
+        self.kind, self.qubits, self.layers, self.hidden, self.bands, self.rgb = kind, qubits, layers, hidden, bands, rgb
         hidden_vision = 64
         self.vision = nn.Sequential(
-            nn.Conv2d(FRAMES, 16, 5, stride=3), nn.ReLU(), nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),
+            nn.Conv2d(FRAMES*3 if rgb else FRAMES, 16, 5, stride=3), nn.ReLU(), nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),
             nn.Conv2d(32, 32, 3, stride=2), nn.ReLU(), nn.Flatten(), nn.Linear(32*4*7, 64), nn.ReLU())
         self.fusion = nn.Sequential(nn.Linear(64+PLAYER_DIM+4*bands, hidden), nn.ReLU(),
                                     nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 48), nn.Tanh())
@@ -84,10 +90,14 @@ class PlayerModel(nn.Module):
         self.actor = nn.Linear(qubits, len(ACTIONS))
         self.classical_actor = nn.Linear(48, len(ACTIONS))
         self.quantum_gain = nn.Parameter(torch.tensor(1.0))
-        self.aux_head = nn.Linear(hidden_vision, len(AUX_INDEX)) if aux else None
+        # RGB models predict what is visible from vision and the route (4 targets) from the fused map features.
+        self.aux_head = nn.Linear(hidden_vision, len(AUX_INDEX)-4 if rgb else len(AUX_INDEX)) if aux else None
+        self.aux_route = nn.Linear(48, 4) if aux and rgb else None
 
     def forward(self, pixels, features, return_aux=False):
         # Fourier features let the network carve the map into small regions from (x, y).
+        if pixels.dim() == 5:
+            pixels = pixels.permute(0, 1, 4, 2, 3).flatten(1, 2)
         xy = features[:, POS:POS+2]*4096
         scales = 2.0**torch.arange(self.bands, device=xy.device)*(2*math.pi/4096)
         phase = (xy.unsqueeze(-1)*scales).flatten(1)
@@ -96,21 +106,23 @@ class PlayerModel(nn.Module):
         a = self.angles(fused)
         measured = self.core(a*math.pi) if self.kind == 'quantum' else self.core(a)
         logits = self.classical_actor(fused)+self.quantum_gain*self.actor(measured)
-        return (logits, self.aux_head(seen)) if return_aux else logits
+        if not return_aux:
+            return logits
+        return logits, torch.cat([self.aux_route(fused), self.aux_head(seen)], -1) if self.rgb else self.aux_head(seen)
 
 
 def save_player(path, model, metadata):
     from pathlib import Path
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     torch.save(dict(schema=SCHEMA, kind=model.kind, qubits=model.qubits, layers=model.layers, hidden=model.hidden,
-                    bands=model.bands, aux=model.aux_head is not None, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
+                    bands=model.bands, aux=model.aux_head is not None, rgb=model.rgb, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
 
 
 def load_player(path):
     data = torch.load(path, map_location='cpu', weights_only=True)
     if data['schema'] != SCHEMA or data['names'] != list(PLAYER_NAMES):
         raise ValueError('Incompatible player checkpoint')
-    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False))
+    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False), rgb=data.get('rgb', False))
     model.load_state_dict(data['state_dict'])
     return model.eval()
 

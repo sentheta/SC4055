@@ -1,7 +1,8 @@
 #!/bin/bash
 # player-dagger.sh MAP STEPS RUN ROUNDS EPISODES [KIND]: DAgger for the player-view student. Env BETA, START, EVALS.
 # Training seeds start at 2000; evaluation seeds 800+ are never trained on.
-MAP=$1; STEPS=$2; RUN=$3; ROUNDS=$4; EP=$5; KIND=${6:-quantum}; BETA=${BETA:-0.3}; EVALS=${EVALS:-20}
+MAP=$1; STEPS=$2; RUN=$3; ROUNDS=$4; EP=$5; KIND=${6:-quantum}; # env RGB, COLLECT_LIMIT, AUX pass through
+ BETA=${BETA:-0.3}; EVALS=${EVALS:-20}
 P=./.conda/bin/python; D=outputs/p/$RUN; mkdir -p $D
 EVAL="$(seq 800 $((799+EVALS)))"
 for r in $(seq ${START:-0} $ROUNDS); do

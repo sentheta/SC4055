@@ -7,11 +7,11 @@ from corridor_qnn.player import PlayerView, load_player, act
 ckpt, name, steps, out, seed = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4], int(sys.argv[5])
 model = load_player(ckpt)
 env = FullDoom(map=name, max_steps=steps, auto_weapon=True, navigation='improved2')
-view = PlayerView(env); view.reset(); obs = env.reset(seed=seed); frames = []; t = 0
+view = PlayerView(env, model.rgb); view.reset(); obs = env.reset(seed=seed); frames = []; t = 0
 while True:
     view.vector = view.update(obs)
     if t % 4 == 0:
-        frames.append(Image.fromarray(np.asarray(obs.pixels).squeeze().astype(np.uint8)).resize((288, 192)).convert('P'))
+        frames.append(Image.fromarray(obs.frame).resize((288, 216)).convert('P'))
     obs, _, done, info = env.step(act(model, view)); t += 1
     if done:
         break
