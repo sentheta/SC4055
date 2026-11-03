@@ -6,6 +6,7 @@ MAP=$1; STEPS=$2; RUN=$3; ROUNDS=$4; EP=$5; KIND=${6:-quantum}; # env RGB, COLLE
 P=./.conda/bin/python; D=outputs/p/$RUN; mkdir -p $D
 EVAL="$(seq 800 $((799+EVALS)))"
 for r in $(seq ${START:-0} $ROUNDS); do
+  [ -n "$STOP" ] && [ "$(date +%H%M)" -ge "$STOP" ] && break
   S=$((2000+r*100))
   if [ $r = 0 ]; then
     $P scripts/player-run.py collect $D/d0.npz $MAP $STEPS 1 none $(seq $S $((S+EP-1))) 2>&1 | grep -E "^collect|Error"
