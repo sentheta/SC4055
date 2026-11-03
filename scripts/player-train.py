@@ -1,6 +1,7 @@
 """Behaviour cloning for the player-view student.
 
-  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss, MEMORY=sequence length for a GRU student)
+  player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss, MEMORY=sequence length for a GRU student,
+    VISION=CNN weights from vision-pretrain.py to start from, FREEZE_VISION=1 keeps them fixed)
 """
 import json
 import os
@@ -29,6 +30,10 @@ aux_weight = float(os.environ.get('AUX', 0))
 model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0, rgb=images.ndim == 4)
 if aux_weight > 0 and model.aux_head is None:
     model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
+if os.environ.get('VISION'):
+    model.vision.load_state_dict(torch.load(os.environ['VISION']))
+if os.environ.get('FREEZE_VISION') == '1':
+    model.vision.requires_grad_(False)
 seq = int(os.environ.get('MEMORY', 0))
 if seq and model.gru is None:
     model.gru = torch.nn.GRU(48, 48, batch_first=True)
@@ -37,7 +42,7 @@ train = np.flatnonzero(~held); val = np.flatnonzero(held)
 counts = np.bincount(labels[train], minlength=len(ACTIONS))
 weights = torch.tensor(np.where(counts > 0, np.sqrt(counts.max()/np.maximum(counts, 1)), 0), dtype=torch.float32)
 lr = float(os.environ.get('LR', 1e-3))
-opt = torch.optim.Adam(model.parameters(), lr=lr)
+opt = torch.optim.Adam([q for q in model.parameters() if q.requires_grad], lr=lr)
 per = 12 if seq else 256  # batch of 12 sequences, or of 256 frames
 unit = max(seq, 1)
 steps = epochs*(len(train)//(per*unit)+1)
