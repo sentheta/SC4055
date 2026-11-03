@@ -408,3 +408,5 @@ Memory limit: RGB datasets are about 600 MB each in RAM. With about 4.5 GB free,
 E1M1 player model: PennyLane on seeds 900-939: 36/40 (1 death), the same as torch.
 
 E1M2 `e1m2_v` rounds 26-36: still 0/20, with 11-18 deaths, 76-111 cells and keys in 3-10 runs. Final check on seeds 900-919: round 36 0/20 (14 deaths, 111 cells, 10 keys); after a low-rate fine-tune 0/20 (17 deaths, 84 cells). Round 36 is exported to `results/player/E1M2` as the best attempt. E1M2 isn't solved from the player view, and E1M3 onward weren't attempted with it.
+
+Death analysis of the final E1M2 model on seeds 900-911 (8 deaths, 4 timeouts): in the last 40 steps before each death it agrees with the teacher 44% of the time, against 37% before the enemy detector. An enemy is visible in 60% of those steps. The main errors are the same as before: walking forward or turning the wrong way when the teacher turns, often to shoot. Health at the start of that window is still usually 2-20. The detector helped a little but didn't fix aiming or attrition.
