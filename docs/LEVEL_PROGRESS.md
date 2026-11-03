@@ -406,3 +406,5 @@ Diagnosis on fresh student-driven episodes:
 Memory limit: RGB datasets are about 600 MB each in RAM. With about 4.5 GB free, training uses a sliding window of the newest 5 datasets rather than all of them.
 
 E1M1 player model: PennyLane on seeds 900-939: 36/40 (1 death), the same as torch.
+
+E1M2 `e1m2_v` rounds 26-36: still 0/20, with 11-18 deaths, 76-111 cells and keys in 3-10 runs. Final check on seeds 900-919: round 36 0/20 (14 deaths, 111 cells, 10 keys); after a low-rate fine-tune 0/20 (17 deaths, 84 cells). Round 36 is exported to `results/player/E1M2` as the best attempt. E1M2 isn't solved from the player view, and E1M3 onward weren't attempted with it.
