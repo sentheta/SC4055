@@ -7,3 +7,4 @@ PennyLane on seeds 900-919: 17/20, the same as torch. Logits differ by at most 4
 Larger E1M1 check on new seeds 1000-1079:
 - model: eval E1M1 completed 74 / 80 | deaths 1 | mean cells 63 | keys 0 06:42
 - classical: eval E1M1 completed 64 / 80 | deaths 5 | mean cells 62 | keys 0 06:45
+- PennyLane on seeds 900-939: 36/40 (1 death), the same as torch.

@@ -404,3 +404,5 @@ Diagnosis on fresh student-driven episodes:
 - Trained alone on 114k frames, the CNN reaches enemy recall of about 0.77 at precision 0.82 and picks the enemy's side correctly about 78% of the time. Inside the student, the action loss crowds this out. Replacing the student's CNN with the detector lost navigation, while adding it as extra inputs kept navigation.
 
 Memory limit: RGB datasets are about 600 MB each in RAM. With about 4.5 GB free, training uses a sliding window of the newest 5 datasets rather than all of them.
+
+E1M1 player model: PennyLane on seeds 900-939: 36/40 (1 death), the same as torch.
