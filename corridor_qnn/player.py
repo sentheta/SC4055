@@ -70,17 +70,26 @@ class PlayerView:
         return np.stack([frames[0]]*(FRAMES-len(frames))+frames)
 
 
+def _cnn(channels):
+    return nn.Sequential(
+        nn.Conv2d(channels, 16, 5, stride=3), nn.ReLU(), nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),
+        nn.Conv2d(32, 32, 3, stride=2), nn.ReLU(), nn.Flatten(), nn.Linear(32*4*7, 64), nn.ReLU())
+
+
 class PlayerModel(nn.Module):
     """Pixels and player features -> CNN and MLP -> 6 angles -> circuit -> action logits."""
 
-    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False, aux=False, rgb=False):
+    def __init__(self, kind='quantum', qubits=6, layers=2, hidden=256, bands=6, memory=False, aux=False, rgb=False, enemy=False):
         super().__init__()
         self.kind, self.qubits, self.layers, self.hidden, self.bands, self.rgb = kind, qubits, layers, hidden, bands, rgb
         hidden_vision = 64
-        self.vision = nn.Sequential(
-            nn.Conv2d(FRAMES*3 if rgb else FRAMES, 16, 5, stride=3), nn.ReLU(), nn.Conv2d(16, 32, 3, stride=2), nn.ReLU(),
-            nn.Conv2d(32, 32, 3, stride=2), nn.ReLU(), nn.Flatten(), nn.Linear(32*4*7, 64), nn.ReLU())
-        self.fusion = nn.Sequential(nn.Linear(64+PLAYER_DIM+4*bands, hidden), nn.ReLU(),
+        self.vision = _cnn(FRAMES*3 if rgb else FRAMES)
+        # Optional frozen enemy detector (vision-pretrain.py): a second CNN whose 4 outputs are extra inputs.
+        self.enemy = None
+        if enemy:
+            self.enemy = nn.ModuleDict(dict(vision=_cnn(FRAMES*3), head=nn.Linear(64, 4)))
+            self.enemy.requires_grad_(False)
+        self.fusion = nn.Sequential(nn.Linear(64+PLAYER_DIM+4*bands+4*enemy, hidden), nn.ReLU(),
                                     nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 48), nn.Tanh())
         self.angles = nn.Sequential(nn.Linear(48, qubits), nn.Tanh())
         if kind == 'quantum':
@@ -104,7 +113,8 @@ class PlayerModel(nn.Module):
         scales = 2.0**torch.arange(self.bands, device=xy.device)*(2*math.pi/4096)
         phase = (xy.unsqueeze(-1)*scales).flatten(1)
         seen = self.vision(pixels.float()/255)
-        fused = self.fusion(torch.cat([seen, features, phase.sin(), phase.cos()], -1))
+        extra = [self.enemy['head'](self.enemy['vision'](pixels.float()/255))] if self.enemy is not None else []
+        fused = self.fusion(torch.cat([seen, features, phase.sin(), phase.cos(), *extra], -1))
         if self.gru is not None:
             # Inputs are flattened (batch*seq, ...); seq is the sequence length.
             out, self.last_hidden = self.gru(fused.view(-1, seq, 48), hidden)
@@ -121,14 +131,14 @@ def save_player(path, model, metadata):
     from pathlib import Path
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     torch.save(dict(schema=SCHEMA, kind=model.kind, qubits=model.qubits, layers=model.layers, hidden=model.hidden,
-                    bands=model.bands, aux=model.aux_head is not None, rgb=model.rgb, memory=model.gru is not None, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
+                    bands=model.bands, aux=model.aux_head is not None, rgb=model.rgb, memory=model.gru is not None, enemy=model.enemy is not None, names=list(PLAYER_NAMES), state_dict=model.state_dict(), metadata=metadata), path)
 
 
 def load_player(path):
     data = torch.load(path, map_location='cpu', weights_only=True)
     if data['schema'] != SCHEMA or data['names'] != list(PLAYER_NAMES):
         raise ValueError('Incompatible player checkpoint')
-    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False), rgb=data.get('rgb', False), memory=data.get('memory', False))
+    model = PlayerModel(data['kind'], data['qubits'], data['layers'], data['hidden'], data['bands'], aux=data.get('aux', False), rgb=data.get('rgb', False), memory=data.get('memory', False), enemy=data.get('enemy', False))
     model.load_state_dict(data['state_dict'])
     return model.eval()
 

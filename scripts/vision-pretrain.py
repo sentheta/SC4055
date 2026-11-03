@@ -41,4 +41,4 @@ for epoch in range(epochs):
     P, Y = torch.cat(P).numpy(), torch.cat(Y).numpy(); v = Y[:, 0] > .5; hit = P[:, 0] > 0
     side = (np.sign(P[v, 1]) == np.sign(Y[v, 1]))[np.abs(Y[v, 1]) > .1].mean()
     print(f'epoch {epoch+1} recall {hit[v].mean():.3f} precision {(v & hit).sum()/max(hit.sum(), 1):.3f} sin_rmse {np.sqrt(((P[v, 1]-Y[v, 1])**2).mean()):.3f} correct side {side:.3f}', flush=True)
-    torch.save(vision.state_dict(), out)
+    torch.save(dict(vision=vision.state_dict(), head=head.state_dict()), out)

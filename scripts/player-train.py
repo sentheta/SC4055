@@ -1,7 +1,8 @@
 """Behaviour cloning for the player-view student.
 
   player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss, MEMORY=sequence length for a GRU student,
-    VISION=CNN weights from vision-pretrain.py to start from, FREEZE_VISION=1 keeps them fixed)
+    VISION=CNN weights from vision-pretrain.py to start from, FREEZE_VISION=1 keeps them fixed,
+    ENEMY=vision-pretrain.py output added as a frozen enemy detector)
 """
 import json
 import os
@@ -31,7 +32,17 @@ model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os
 if aux_weight > 0 and model.aux_head is None:
     model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
 if os.environ.get('VISION'):
-    model.vision.load_state_dict(torch.load(os.environ['VISION']))
+    model.vision.load_state_dict(torch.load(os.environ['VISION'])['vision'])
+if os.environ.get('ENEMY') and model.enemy is None:
+    from corridor_qnn.player import _cnn
+    model.enemy = torch.nn.ModuleDict(dict(vision=_cnn(model.vision[0].in_channels), head=torch.nn.Linear(64, 4)))
+    weights = torch.load(os.environ['ENEMY']); model.enemy['vision'].load_state_dict(weights['vision']); model.enemy['head'].load_state_dict(weights['head'])
+    model.enemy.requires_grad_(False)
+    # Widen the first fusion layer with zero columns so the warm-started model starts out unchanged.
+    old = model.fusion[0]; new = torch.nn.Linear(old.in_features+4, old.out_features)
+    with torch.no_grad():
+        new.weight.zero_(); new.weight[:, :old.in_features] = old.weight; new.bias.copy_(old.bias)
+    model.fusion[0] = new
 if os.environ.get('FREEZE_VISION') == '1':
     model.vision.requires_grad_(False)
 seq = int(os.environ.get('MEMORY', 0))
