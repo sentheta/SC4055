@@ -1,0 +1,381 @@
+{
+ "seeds": "800-819",
+ "runs": {
+  "grayscale (e1m2_a/b)": [
+   {
+    "round": 0,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 0,
+    "cells": 4,
+    "keys": 0
+   },
+   {
+    "round": 1,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 16,
+    "cells": 12,
+    "keys": 0
+   },
+   {
+    "round": 2,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 38,
+    "keys": 0
+   },
+   {
+    "round": 3,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 9,
+    "cells": 31,
+    "keys": 0
+   },
+   {
+    "round": 4,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 65,
+    "keys": 1
+   },
+   {
+    "round": 5,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 78,
+    "keys": 4
+   },
+   {
+    "round": 6,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 9,
+    "cells": 62,
+    "keys": 2
+   },
+   {
+    "round": 7,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 68,
+    "keys": 3
+   },
+   {
+    "round": 8,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 55,
+    "keys": 1
+   },
+   {
+    "round": 9,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 61,
+    "keys": 0
+   },
+   {
+    "round": 10,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 61,
+    "keys": 0
+   },
+   {
+    "round": 11,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 70,
+    "keys": 1
+   },
+   {
+    "round": 12,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 11,
+    "cells": 65,
+    "keys": 3
+   },
+   {
+    "round": 13,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 9,
+    "cells": 67,
+    "keys": 2
+   },
+   {
+    "round": 14,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 72,
+    "keys": 2
+   },
+   {
+    "round": 15,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 10,
+    "cells": 83,
+    "keys": 5
+   }
+  ],
+  "RGB (e1m2_rgb)": [
+   {
+    "round": 0,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 0,
+    "cells": 1,
+    "keys": 0
+   },
+   {
+    "round": 1,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 19,
+    "cells": 11,
+    "keys": 0
+   },
+   {
+    "round": 2,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 0,
+    "cells": 1,
+    "keys": 0
+   },
+   {
+    "round": 3,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 17,
+    "cells": 27,
+    "keys": 0
+   },
+   {
+    "round": 4,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 12,
+    "cells": 70,
+    "keys": 0
+   },
+   {
+    "round": 5,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 66,
+    "keys": 1
+   },
+   {
+    "round": 6,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 17,
+    "cells": 54,
+    "keys": 3
+   },
+   {
+    "round": 7,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 19,
+    "cells": 69,
+    "keys": 4
+   },
+   {
+    "round": 8,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 91,
+    "keys": 9
+   },
+   {
+    "round": 9,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 18,
+    "cells": 93,
+    "keys": 8
+   },
+   {
+    "round": 10,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 16,
+    "cells": 78,
+    "keys": 5
+   },
+   {
+    "round": 11,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 100,
+    "keys": 6
+   },
+   {
+    "round": 12,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 18,
+    "cells": 100,
+    "keys": 7
+   },
+   {
+    "round": 13,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 84,
+    "keys": 6
+   },
+   {
+    "round": 14,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 20,
+    "cells": 90,
+    "keys": 7
+   }
+  ],
+  "RGB + GRU": [
+   {
+    "round": 15,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 19,
+    "cells": 101,
+    "keys": 8
+   },
+   {
+    "round": 16,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 18,
+    "cells": 81,
+    "keys": 6
+   },
+   {
+    "round": 17,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 113,
+    "keys": 10
+   },
+   {
+    "round": 18,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 17,
+    "cells": 90,
+    "keys": 5
+   },
+   {
+    "round": 19,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 80,
+    "keys": 6
+   },
+   {
+    "round": 20,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 16,
+    "cells": 85,
+    "keys": 8
+   }
+  ],
+  "RGB + GRU + enemy detector (e1m2_v)": [
+   {
+    "round": 21,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 14,
+    "cells": 84,
+    "keys": 8
+   },
+   {
+    "round": 22,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 11,
+    "cells": 107,
+    "keys": 7
+   },
+   {
+    "round": 23,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 15,
+    "cells": 105,
+    "keys": 8
+   },
+   {
+    "round": 24,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 12,
+    "cells": 93,
+    "keys": 6
+   },
+   {
+    "round": 25,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 69,
+    "keys": 3
+   },
+   {
+    "round": 26,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 16,
+    "cells": 86,
+    "keys": 4
+   },
+   {
+    "round": 27,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 12,
+    "cells": 79,
+    "keys": 6
+   },
+   {
+    "round": 28,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 13,
+    "cells": 79,
+    "keys": 3
+   },
+   {
+    "round": 29,
+    "completed": 0,
+    "episodes": 20,
+    "deaths": 11,
+    "cells": 76,
+    "keys": 5
+   }
+  ]
+ }
+}
