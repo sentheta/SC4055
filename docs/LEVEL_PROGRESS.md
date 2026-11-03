@@ -383,3 +383,24 @@ Where this stands: E1M1 meets the 90% target from the player view. E1M2 does not
 Larger E1M1 check on new seeds 1000-1079:
 - model: eval E1M1 completed 74 / 80 | deaths 1 | mean cells 63 | keys 0 06:42
 - classical: eval E1M1 completed 64 / 80 | deaths 5 | mean cells 62 | keys 0 06:45
+
+### E1M2 player view, 2-3 Nov
+
+All results are on seeds 800-819 unless stated, and E1M2 completed 0/20 throughout.
+
+| Change | Rounds | Deaths / 20 | Mean cells | Runs with a key |
+|---|---|---|---|---|
+| RGB frames, split auxiliary heads (`e1m2_rgb`) | 0-14 | 14-20 | 54-100 | 3-9 |
+| Low-rate fine-tune of round 14 (seeds 900-919) | - | 16 | 91 | 7 |
+| GRU memory, 24-step sequences | 15-20 | 15-19 | 80-113 | 5-10 |
+| Pretrained CNN replacing the student's own, frozen | 21 | 16 | 29 | 0 |
+| Frozen pretrained enemy detector beside the student's CNN (`e1m2_v`) | 21-25 | 11-15 | 69-107 | 3-8 |
+
+Diagnosis on fresh student-driven episodes:
+
+- The 64x96 grayscale student's enemy predictions were no better than predicting the mean. In those frames, enemies are a few dark pixels.
+- A vision-only CNN trained on 10 episodes found enemies with recall 0.35 in grayscale and 0.49 in RGB. Higher resolution did not help.
+- In the last 40 steps before each death, the student agreed with the teacher 37% of the time and an enemy was visible in 54% of steps. Most disagreements were turning the wrong way or walking instead of turning to shoot. Health was already 1-23 at the start of that window, so the student is worn down over many fights.
+- Trained alone on 114k frames, the CNN reaches enemy recall of about 0.77 at precision 0.82 and picks the enemy's side correctly about 78% of the time. Inside the student, the action loss crowds this out. Replacing the student's CNN with the detector lost navigation, while adding it as extra inputs kept navigation.
+
+Memory limit: RGB datasets are about 600 MB each in RAM. With about 4.5 GB free, training uses a sliding window of the newest 5 datasets rather than all of them.
