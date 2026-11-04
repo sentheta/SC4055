@@ -2,7 +2,8 @@
 
   player-train.py OUT.pt EPOCHS KIND INIT|none DATA.npz [DATA.npz ...]   (env LR, THREADS, HIDDEN, AUX=weight of the training-only auxiliary loss, MEMORY=sequence length for a GRU student,
     VISION=CNN weights from vision-pretrain.py to start from, FREEZE_VISION=1 keeps them fixed,
-    ENEMY=vision-pretrain.py output added as a frozen enemy detector)
+    ENEMY=vision-pretrain.py output added as a frozen enemy detector (or replacing an existing one),
+    ENEMY_WEIGHT=loss weight for frames with an enemy visible, from the training-only targets)
 """
 import json
 import os
@@ -11,6 +12,7 @@ import time
 import numpy as np
 import torch
 from corridor_qnn.full_actions import ACTIONS
+from corridor_qnn.full_environment import BASE_FEATURES
 from corridor_qnn.player import AUX_INDEX, PlayerModel, load_player, save_player, stack_indices
 
 out, epochs, kind, init, paths = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5:]
@@ -28,6 +30,7 @@ for path, n in zip(paths, sizes):
         aux[at:at+n] = data['aux']  # older datasets stay NaN and are masked out of the loss
     episodes[at:at+n] = data['episode_ids']+offset; offset = episodes[at+n-1]+1; at += n
 aux_weight = float(os.environ.get('AUX', 0))
+enemy_weight = float(os.environ.get('ENEMY_WEIGHT', 1))
 model = load_player(init) if init != 'none' else PlayerModel(kind, hidden=int(os.environ.get('HIDDEN', 256)), aux=aux_weight > 0, rgb=images.ndim == 4)
 if aux_weight > 0 and model.aux_head is None:
     model.aux_head = torch.nn.Linear(64, len(AUX_INDEX))
@@ -43,6 +46,8 @@ if os.environ.get('ENEMY') and model.enemy is None:
     with torch.no_grad():
         new.weight.zero_(); new.weight[:, :old.in_features] = old.weight; new.bias.copy_(old.bias)
     model.fusion[0] = new
+elif os.environ.get('ENEMY'):
+    weights = torch.load(os.environ['ENEMY']); model.enemy['vision'].load_state_dict(weights['vision']); model.enemy['head'].load_state_dict(weights['head'])
 if os.environ.get('FREEZE_VISION') == '1':
     model.vision.requires_grad_(False)
 seq = int(os.environ.get('MEMORY', 0))
@@ -82,7 +87,10 @@ for epoch in range(1, epochs+1):
             extra = ((predicted-target.nan_to_num())[mask]**2).mean() if mask.any() else 0.
         else:
             logits, extra = model(x, f, seq=unit), 0.
-        loss = torch.nn.functional.cross_entropy(logits, y, weight=weights)+aux_weight*extra
+        ce = torch.nn.functional.cross_entropy(logits, y, weight=weights, reduction="none")
+        visible = torch.from_numpy(aux[chosen][:, AUX_INDEX.index(BASE_FEATURES.index('enemy_visible'))] > .5)
+        scale = 1+(enemy_weight-1)*visible.float()
+        loss = (ce*scale).sum()/(weights[y]*scale).sum()+aux_weight*extra
         opt.zero_grad(set_to_none=True); loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 2); opt.step()
         if sched.last_epoch < steps-1:
