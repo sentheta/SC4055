@@ -416,3 +416,9 @@ Death analysis of the final E1M2 model on seeds 900-911 (8 deaths, 4 timeouts): 
 The enemy detector was retrained over 36 colour datasets (about a million frames), one file in memory at a time (`scripts/vision-pretrain-stream.py`). On a held-out dataset, recall went from 0.825 to 0.886, precision from 0.823 to 0.872 and correct side from 0.817 to 0.855. It replaced the detector in the round-36 student. Frames with an enemy visible got 3x loss weight (`ENEMY_WEIGHT=3`) from then on.
 
 Rounds 37-41 on seeds 800-819: 0/20 every round, with 12-17 deaths, 87-107 cells and keys in 4-9 runs. That is no change from rounds 26-36. A better detector with heavier combat weight doesn't turn into better play.
+
+### 4 Nov 2026 — DAgger rounds 42-55 with the larger detector (E1M2)
+- Continued DAgger (BETA 0.5, newest 5 datasets) through round 55 with the frozen big enemy detector and combat weight 3.
+- Seeds 800-819: 0/20 completed in every round; deaths 11-19, mean cells 79-136 (best coverage round 54: 136 cells, 14 keys).
+- Final m55 on fresh seeds 900-919: 0/20, 19 deaths, 112 mean cells.
+- Conclusion: more DAgger rounds on this architecture no longer move E1M2; survival (combat) remains the bottleneck and death count did not fall. `results/player/E1M2/model.pt` (round 36) is kept unchanged.
